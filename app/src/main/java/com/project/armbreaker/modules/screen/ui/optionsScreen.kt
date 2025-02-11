@@ -21,7 +21,7 @@ import com.project.armbreaker.R
 fun GameSettingsScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.optionsbackground),
+            painter = painterResource(id = R.drawable.optionsbackground),//Kay wala pa ko mabutang
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -32,7 +32,7 @@ fun GameSettingsScreen() {
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp, vertical = 64.dp)
                 .background(
-                    color = Color(0xAA000000), // semi-transparent black
+                    color = Color(0xAA000000),
                     shape = RoundedCornerShape(16.dp)
                 )
         ) {
