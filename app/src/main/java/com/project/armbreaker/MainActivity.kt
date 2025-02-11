@@ -1,5 +1,6 @@
 package com.project.armbreaker
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,8 +20,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
+            gameScreen()
         }
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PrevGameScreen() {
+    gameScreen()
+}
