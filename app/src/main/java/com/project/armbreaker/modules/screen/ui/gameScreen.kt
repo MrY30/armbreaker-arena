@@ -62,7 +62,7 @@ fun gameScreen(){
 
             while (gameStarted) {
                 delay(1000)
-                score -= 5
+                score -= 20
                 if (score <= -50) {
                     gameStarted = false
                     countdownText = "You Lose! Tap to Restart"
