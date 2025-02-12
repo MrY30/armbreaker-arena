@@ -1,27 +1,16 @@
 package com.project.armbreaker.modules.screen.ui
 
-import android.webkit.WebSettings
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,22 +22,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.BeyondBoundsLayout
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 
 
 @Composable
-fun gameScreen(){
+fun GameScreen(navController: NavController){
     var score by remember { mutableStateOf(0) }
     var gameStarted by remember { mutableStateOf(false) }
     var countdownText by remember { mutableStateOf("Tap to Start") }
+    var allowRestart by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(gameStarted) {
@@ -60,18 +49,19 @@ fun gameScreen(){
             }
             countdownText = "TAP FAST!"
 
-            while (gameStarted) {
+            while (countdownText == "TAP FAST!") {
                 delay(1000)
-                score -= 20
+                score -= 1
                 if (score <= -50) {
-                    gameStarted = false
                     countdownText = "You Lose! Tap to Restart"
+                    allowRestart = true
+                    score = -50
                 }
             }
         }
     }
 
-    Surface (
+    Box (
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
@@ -122,10 +112,13 @@ fun gameScreen(){
                             gameStarted = true
                             countdownText = "3"
                         } else {
-                            score += 1
-                            if (score >= 100) {
-                                gameStarted = false
-                                countdownText = "You Win! Tap to Restart"
+                            if(countdownText == "TAP FAST!"){
+                                score += 1
+                                if (score >= 100) {
+                                    countdownText = "You Win! Tap to Restart"
+                                    allowRestart = true
+                                    score = 100
+                                }
                             }
                         }
                     }
@@ -141,32 +134,32 @@ fun gameScreen(){
                         .wrapContentHeight(Alignment.CenterVertically)
                 )
             }
-
-//            Row (){
-//                Button(onClick = {
-//
-//                }, modifier = Modifier
-//                    .weight(1f)
-//                    .padding(2.dp)
-//                ){
-//                    Text(
-//                        text = "START",
-//                        fontSize = 20.sp
-//                    )
-//                }
-//                Button(onClick = {
-//
-//                }, modifier = Modifier
-//                    .weight(1f)
-//                    .padding(2.dp)
-//                ){
-//                    Text(
-//                        text = "BACK",
-//                        fontSize = 20.sp
-//                    )
-//                }
-//            }
-
+            Row (){
+                Button(onClick = {
+                    gameStarted = false
+                    allowRestart = false
+                }, modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp),
+                    enabled = allowRestart
+                ){
+                    Text(
+                        text = "RESTART",
+                        fontSize = 20.sp
+                    )
+                }
+                Button(onClick = {
+                    navController.navigate("home")
+                }, modifier = Modifier
+                    .weight(1f)
+                    .padding(2.dp)
+                ){
+                    Text(
+                        text = "BACK",
+                        fontSize = 20.sp
+                    )
+                }
+            }
 
         }
     }
@@ -174,6 +167,6 @@ fun gameScreen(){
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun screenPreview(){
-    gameScreen()
+fun ScreenPreview(){
+    GameScreen(rememberNavController())
 }

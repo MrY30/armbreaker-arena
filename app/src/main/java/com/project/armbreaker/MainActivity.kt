@@ -12,7 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.project.armbreaker.modules.screen.ui.gameScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.project.armbreaker.modules.screen.ui.GameScreen
+import com.project.armbreaker.modules.screen.ui.HomeScreen
+import com.project.armbreaker.modules.screen.ui.OptionsScreen
 import com.project.armbreaker.ui.theme.ArmbreakerArenaTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,13 +25,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            gameScreen()
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "home") {
+                composable("home") {
+                    HomeScreen(navController = navController)
+                }
+                composable("options"){
+                    OptionsScreen(navController = navController)
+                }
+                composable("game") {
+                    GameScreen(navController = navController)
+                }
+            }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PrevGameScreen() {
-    gameScreen()
 }

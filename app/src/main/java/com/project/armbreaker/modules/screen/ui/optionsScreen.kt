@@ -15,13 +15,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.R
 
 @Composable
-fun GameSettingsScreen() {
+fun OptionsScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.optionsbackground),//Kay wala pa ko mabutang
+            painter = painterResource(id = R.drawable.ic_launcher_background),//Kay wala pa ko mabutang
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -50,35 +52,37 @@ fun GameSettingsScreen() {
                 )
 
                 Button(
-                    onClick = { /* TODO: Open Audio Settings */ },
+                    onClick = {},
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Audio Settings")
                 }
 
                 Button(
-                    onClick = { /* TODO: Open Video/Graphics Settings */ },
+                    onClick = {  },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Video Settings")
                 }
 
                 Button(
-                    onClick = { /* TODO: Open Control Settings */ },
+                    onClick = {  },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Control Settings")
                 }
 
                 Button(
-                    onClick = { /* TODO: Open Gameplay Settings */ },
+                    onClick = {  },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Gameplay Settings")
                 }
 
                 Button(
-                    onClick = { /* TODO: Return to main menu or previous screen */ },
+                    onClick = {
+                        navController.navigate("home")
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Back")
@@ -91,5 +95,5 @@ fun GameSettingsScreen() {
 @Preview(showBackground = true)
 @Composable
 fun GameSettingsScreenPreview() {
-    GameSettingsScreen()
+    OptionsScreen(rememberNavController())
 }
