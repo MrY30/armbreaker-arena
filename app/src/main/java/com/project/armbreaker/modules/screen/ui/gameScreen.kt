@@ -1,5 +1,7 @@
 package com.project.armbreaker.modules.screen.ui
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -40,6 +44,13 @@ fun GameScreen(navController: NavController){
     var allowRestart by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    //ROTATION BOX
+    var rotationAngle by remember{ mutableStateOf(0f)}
+    val animatedRotation by animateFloatAsState(
+        targetValue = rotationAngle,
+        animationSpec = tween(500)
+    )
+
     LaunchedEffect(gameStarted) {
         if (gameStarted) {
             val countdown = listOf("3", "2", "1", "Fight!")
@@ -49,13 +60,16 @@ fun GameScreen(navController: NavController){
             }
             countdownText = "TAP FAST!"
 
-            while (countdownText == "TAP FAST!") {
-                delay(1000)
-                score -= 1
-                if (score <= -50) {
-                    countdownText = "You Lose! Tap to Restart"
-                    allowRestart = true
-                    score = -50
+            scope.launch {
+                while (countdownText == "TAP FAST!") {
+                    delay(1000)
+                    rotationAngle += 20f
+                    score -= 20
+                    if (score <= -50) {
+                        countdownText = "You Lose! Tap to Restart"
+                        allowRestart = true
+                        score = -50
+                    }
                 }
             }
         }
@@ -106,13 +120,15 @@ fun GameScreen(navController: NavController){
                     .fillMaxSize()
                     .border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
+                    .rotate(animatedRotation)
                     .clickable {
                         if (!gameStarted) {
                             score = 0
                             gameStarted = true
                             countdownText = "3"
                         } else {
-                            if(countdownText == "TAP FAST!"){
+                            if (countdownText == "TAP FAST!") {
+                                rotationAngle -= 1f
                                 score += 1
                                 if (score >= 100) {
                                     countdownText = "You Win! Tap to Restart"
