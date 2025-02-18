@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -25,6 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,10 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.request.RequestOptions
+import com.project.armbreaker.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GameScreen(navController: NavController){
     var score by remember { mutableStateOf(0) }
@@ -63,8 +72,8 @@ fun GameScreen(navController: NavController){
             scope.launch {
                 while (countdownText == "TAP FAST!") {
                     delay(1000)
-                    rotationAngle += 20f
-                    score -= 20
+                    rotationAngle += 5f
+                    score -= 5
                     if (score <= -50) {
                         countdownText = "You Lose! Tap to Restart"
                         allowRestart = true
@@ -79,12 +88,17 @@ fun GameScreen(navController: NavController){
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .padding(
-                start = 8.dp,
-                end = 8.dp,
-                bottom = 20.dp
-            )
+            .navigationBarsPadding()
     ){
+        //Background GIF from drawable using Glide dependency
+        GlideImage(
+            model = R.drawable.game_background, // Uses game_background.gif from drawable as background
+            contentDescription = "Game Background",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+        )
+
+        //Foreground UI Composable
         Column (
             modifier = Modifier,
             verticalArrangement = Arrangement.SpaceBetween,
@@ -120,7 +134,11 @@ fun GameScreen(navController: NavController){
                     .fillMaxSize()
                     .border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
-                    .rotate(animatedRotation)
+                    .graphicsLayer(
+                        rotationZ = animatedRotation,
+                        transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1.0f)
+                    )
+                    //.rotate(animatedRotation)
                     .clickable {
                         if (!gameStarted) {
                             score = 0
