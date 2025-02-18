@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +31,8 @@ import com.project.armbreaker.R
 fun OptionsScreen(navController: NavController) {
 
     var volume by remember { mutableStateOf(0.5f) } // Initial value at 50%
+    var isVolumeOn by remember { mutableStateOf(true) }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -62,6 +65,17 @@ fun OptionsScreen(navController: NavController) {
                 )
                 // Volume control using a slider
                 Text(text = "Volume", color = Color.White)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = if (isVolumeOn) "On" else "Off", color = Color.White)
+                    Switch(
+                        checked = isVolumeOn,
+                        onCheckedChange = { isVolumeOn = it },  // Toggle the state
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
                 Slider(
                     value = volume,
                     onValueChange = { newVolume ->
