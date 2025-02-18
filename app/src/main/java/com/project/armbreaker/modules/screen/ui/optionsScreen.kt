@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.R
 
+
+//Unfinished (Fully Static)
 @Composable
 fun OptionsScreen(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
