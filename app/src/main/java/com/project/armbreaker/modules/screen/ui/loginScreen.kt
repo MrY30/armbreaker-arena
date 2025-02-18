@@ -19,6 +19,10 @@ fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
+    var email by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+
+    // Stores the account data temporarily in memory
     val accounts = remember { mutableStateOf(mutableMapOf<String, String>()) }
 
     Column(
@@ -28,6 +32,7 @@ fun LoginScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Show Login or Sign Up Text
         Text(text = if (isLogin) "Login" else "Sign Up", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -51,6 +56,29 @@ fun LoginScreen(navController: NavController) {
             visualTransformation = PasswordVisualTransformation()
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Show additional fields (Email and Phone) only when signing up
+        if (!isLogin) {
+            // Email input
+            TextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email Address") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Phone Number input
+            TextField(
+                value = phoneNumber,
+                onValueChange = { phoneNumber = it },
+                label = { Text("Phone Number") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Login or Signup Button
@@ -66,8 +94,11 @@ fun LoginScreen(navController: NavController) {
                     }
                 } else {
                     // Handle signup
-                    if (username.isNotBlank() && password.isNotBlank()) {
-                        accounts.value[username] = password
+                    if (username.isNotBlank() && password.isNotBlank() && email.isNotBlank() && phoneNumber.isNotBlank()) {
+                        // Here, we add username, password, email, and phone to the account map
+                        accounts.value[username] = password // This is just a temporary storage for simplicity
+                        // You can store other information as needed (e.g., email, phone)
+
                         Toast.makeText(navController.context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
                         isLogin = true // Switch to login after signup
                         navController.navigate("home") // Navigate to home screen after signup
