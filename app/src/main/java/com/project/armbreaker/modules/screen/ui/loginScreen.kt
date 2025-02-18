@@ -2,24 +2,20 @@ package com.project.armbreaker.modules.screen.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun LoginUI(context: Context) {
+fun LoginScreen(navController: NavController) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
@@ -63,18 +59,20 @@ fun LoginUI(context: Context) {
                 if (isLogin) {
                     // Handle login
                     if (accounts.value.containsKey(username) && accounts.value[username] == password) {
-                        Toast.makeText(context, "Login Successful", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Login Successful", Toast.LENGTH_SHORT).show()
+                        navController.navigate("home") // Navigate to home screen
                     } else {
-                        Toast.makeText(context, "Invalid username or password", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Invalid username or password", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     // Handle signup
                     if (username.isNotBlank() && password.isNotBlank()) {
                         accounts.value[username] = password
-                        Toast.makeText(context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
                         isLogin = true // Switch to login after signup
+                        navController.navigate("home") // Navigate to home screen after signup
                     } else {
-                        Toast.makeText(context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(navController.context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -92,13 +90,8 @@ fun LoginUI(context: Context) {
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
-fun PreviewLoginUI() {
-
-    val context = LocalContext.current
-    LoginUI(context)
+fun PreviewLoginScreen() {
+    LoginScreen(navController = rememberNavController())
 }
-

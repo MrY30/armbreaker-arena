@@ -65,6 +65,18 @@ fun HomeScreen(navController: NavController){
                 )
             }
             Button(onClick = {
+                navController.navigate("login")
+            }, modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(2.dp)
+            ){
+                Text(
+                    text = "LOGIN",
+                    fontSize = 20.sp
+                )
+            }
+            Button(onClick = {
                 navController.navigate("options")
             }, modifier = Modifier
                 .weight(1f)

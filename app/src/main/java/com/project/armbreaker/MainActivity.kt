@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.modules.screen.ui.GameScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
+import com.project.armbreaker.modules.screen.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 import com.project.armbreaker.ui.theme.ArmbreakerArenaTheme
 
@@ -27,6 +28,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "home") {
+                composable("login") {
+                    LoginScreen(navController = navController)
+                }
                 composable("home") {
                     HomeScreen(navController = navController)
                 }
