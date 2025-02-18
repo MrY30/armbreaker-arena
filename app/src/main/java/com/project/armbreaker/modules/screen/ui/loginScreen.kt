@@ -1,4 +1,4 @@
-//Unfinished
+//Unfinished (Semi Static)
 package com.project.armbreaker.modules.screen.ui
 
 import android.content.Context
