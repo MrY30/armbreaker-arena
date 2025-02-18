@@ -6,8 +6,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +28,9 @@ import com.project.armbreaker.R
 //Unfinished (Fully Static)
 @Composable
 fun OptionsScreen(navController: NavController) {
+
+    var volume by remember { mutableStateOf(0.5f) } // Initial value at 50%
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.ic_launcher_background),//Kay wala pa ko mabutang
@@ -51,6 +59,16 @@ fun OptionsScreen(navController: NavController) {
                     text = "Settings",
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.White
+                )
+                // Volume control using a slider
+                Text(text = "Volume", color = Color.White)
+                Slider(
+                    value = volume,
+                    onValueChange = { newVolume ->
+                        volume = newVolume // Update the volume state
+                    },
+                    valueRange = 0f..1f,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Button(
