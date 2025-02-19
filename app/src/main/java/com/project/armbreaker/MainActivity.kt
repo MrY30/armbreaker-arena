@@ -15,8 +15,10 @@ import com.project.armbreaker.modules.screen.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 
 class MainActivity : ComponentActivity() {
+    //@SuppressLint("WrongConstant", "NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
