@@ -1,20 +1,10 @@
 package com.project.armbreaker
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,7 +13,6 @@ import com.project.armbreaker.modules.screen.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.screen.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
-import com.project.armbreaker.ui.theme.ArmbreakerArenaTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +33,7 @@ class MainActivity : ComponentActivity() {
                 composable("game") {
                     val gameViewModel: GameViewModel = viewModel()
                     GameScreen(navController = navController, gameViewModel = gameViewModel)
+                    //OldGameScreen(navController = navController)
                 }
             }
         }

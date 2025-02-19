@@ -1,8 +1,8 @@
 package com.project.armbreaker.modules.screen.ui
 
-import android.widget.ImageView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,33 +17,69 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.content.ContextCompat.getDrawable
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.bumptech.glide.Glide
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.project.armbreaker.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
+fun OldGameScreen(navController: NavController){
+    var score by remember { mutableStateOf(0) }
+    var gameStarted by remember { mutableStateOf(false) }
+    var countdownText by remember { mutableStateOf("Tap to Start") }
+    var allowRestart by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     //ROTATION BOX
-    val animateArm by animateFloatAsState(
-        targetValue = gameViewModel.rotationAngle,
+    var rotationAngle by remember{ mutableStateOf(0f)}
+    val animatedRotation by animateFloatAsState(
+        targetValue = rotationAngle,
         animationSpec = tween(500)
     )
+
+    LaunchedEffect(gameStarted) {
+        if (gameStarted) {
+            val countdown = listOf("3", "2", "1", "Fight!")
+            for (num in countdown) {
+                countdownText = num
+                delay(1000)
+            }
+            countdownText = "TAP FAST!"
+
+            scope.launch {
+                while (countdownText == "TAP FAST!") {
+                    delay(1000)
+                    rotationAngle += 5f
+                    score -= 5
+                    if (score <= -50) {
+                        countdownText = "You Lose! Tap to Restart"
+                        allowRestart = true
+                        score = -50
+                    }
+                }
+            }
+        }
+    }
 
     Box (
         modifier = Modifier
@@ -52,19 +88,17 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             .navigationBarsPadding()
     ){
 
-        //Background GIF
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                ImageView(context).apply {
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                    Glide.with(context)
-                        .asGif()
-                        .load(R.drawable.game_background)
-                        .placeholder(R.drawable.game_background_placeholder)
-                        .into(this)
-                }
-            }
+        //Background GIF from drawable using Glide dependency
+        Image(
+            modifier = Modifier,   //crops the image to circle shape
+            painter = rememberDrawablePainter(
+                drawable = getDrawable(
+                    LocalContext.current,
+                    R.drawable.game_background
+                )
+            ),
+            contentDescription = "Loading animation",
+            contentScale = ContentScale.Crop,
         )
 
         //Foreground UI Composable
@@ -87,7 +121,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     .wrapContentHeight(Alignment.CenterVertically)
             )
             Text(
-                text = "Score: ${gameViewModel.score}",
+                text = "Score: $score",
                 fontWeight = FontWeight.Bold,
                 fontSize = 35.sp,
                 textAlign = TextAlign.Center,
@@ -104,19 +138,30 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     .border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
                     .graphicsLayer(
-                        rotationZ = animateArm,
+                        rotationZ = animatedRotation,
                         transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1.0f)
                     )
+                    //.rotate(animatedRotation)
                     .clickable {
-                        if(!gameViewModel.gameStarted){
-                            gameViewModel.startGame()
-                        }else{
-                            gameViewModel.tapGameBox()
+                        if (!gameStarted) {
+                            score = 0
+                            gameStarted = true
+                            countdownText = "3"
+                        } else {
+                            if (countdownText == "TAP FAST!") {
+                                rotationAngle -= 1f
+                                score += 1
+                                if (score >= 100) {
+                                    countdownText = "You Win! Tap to Restart"
+                                    allowRestart = true
+                                    score = 100
+                                }
+                            }
                         }
                     }
             ){
                 Text(
-                    text = gameViewModel.countdownText,
+                    text = if(gameStarted) countdownText else "Tap to Start",
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
                     textAlign = TextAlign.Center,
@@ -126,13 +171,14 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                         .wrapContentHeight(Alignment.CenterVertically)
                 )
             }
-            Row{
+            Row (){
                 Button(onClick = {
-                    gameViewModel.restartGame()
+                    gameStarted = false
+                    allowRestart = false
                 }, modifier = Modifier
                     .weight(1f)
                     .padding(2.dp),
-                    enabled = gameViewModel.allowRestart
+                    enabled = allowRestart
                 ){
                     Text(
                         text = "RESTART",
@@ -154,12 +200,4 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
 
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ScreenPreview(){
-    val navController = rememberNavController()
-    val gameViewModel: GameViewModel = viewModel()
-    GameScreen(navController, gameViewModel)
 }

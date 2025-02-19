@@ -29,7 +29,6 @@ class GameViewModel: ViewModel(){
                     delay(1000)
                 }
                 countdownText = "TAP FAST!"
-
                 while (countdownText == "TAP FAST!") {
                     delay(1000)
                     rotationAngle += 5f
@@ -38,7 +37,6 @@ class GameViewModel: ViewModel(){
                         countdownText = "You Lose! Tap to Restart"
                         allowRestart = true
                         score = -50
-                        return@launch
                     }
                 }
             }

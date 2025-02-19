@@ -60,4 +60,7 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-drawablepainter:0.35.0-alpha") // Adding this dependency for GIF background
 
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation ("io.coil-kt:coil-compose:2.2.2")
+    //implementation ("com.google.accompanist:accompanist-glide:0.16.0")
 }
