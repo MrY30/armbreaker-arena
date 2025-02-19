@@ -3,6 +3,7 @@ package com.project.armbreaker.modules.screen.ui
 import android.widget.ImageView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,6 +68,15 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                         .into(this)
                 }
             }
+        )
+
+        Image(
+            modifier = Modifier
+                .fillMaxSize()
+                .border(1.dp, Color.Black)
+                .wrapContentHeight(Alignment.Bottom),
+            painter = painterResource(id = R.drawable.enemy_layer),
+            contentDescription = "Enemy Layer",
         )
 
         //Foreground UI Composable
