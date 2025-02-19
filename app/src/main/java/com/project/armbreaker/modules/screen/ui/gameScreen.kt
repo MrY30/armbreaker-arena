@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.getDrawable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -45,43 +46,13 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun GameScreen(navController: NavController){
-    var score by remember { mutableStateOf(0) }
-    var gameStarted by remember { mutableStateOf(false) }
-    var countdownText by remember { mutableStateOf("Tap to Start") }
-    var allowRestart by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
+fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
 
     //ROTATION BOX
-    var rotationAngle by remember{ mutableStateOf(0f)}
     val animatedRotation by animateFloatAsState(
-        targetValue = rotationAngle,
+        targetValue = gameViewModel.rotationAngle,
         animationSpec = tween(500)
     )
-
-    LaunchedEffect(gameStarted) {
-        if (gameStarted) {
-            val countdown = listOf("3", "2", "1", "Fight!")
-            for (num in countdown) {
-                countdownText = num
-                delay(1000)
-            }
-            countdownText = "TAP FAST!"
-
-            scope.launch {
-                while (countdownText == "TAP FAST!") {
-                    delay(1000)
-                    rotationAngle += 5f
-                    score -= 5
-                    if (score <= -50) {
-                        countdownText = "You Lose! Tap to Restart"
-                        allowRestart = true
-                        score = -50
-                    }
-                }
-            }
-        }
-    }
 
     Box (
         modifier = Modifier
@@ -123,7 +94,7 @@ fun GameScreen(navController: NavController){
                     .wrapContentHeight(Alignment.CenterVertically)
             )
             Text(
-                text = "Score: $score",
+                text = "Score: ${gameViewModel.score}",
                 fontWeight = FontWeight.Bold,
                 fontSize = 35.sp,
                 textAlign = TextAlign.Center,
@@ -143,27 +114,16 @@ fun GameScreen(navController: NavController){
                         rotationZ = animatedRotation,
                         transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1.0f)
                     )
-                    //.rotate(animatedRotation)
                     .clickable {
-                        if (!gameStarted) {
-                            score = 0
-                            gameStarted = true
-                            countdownText = "3"
-                        } else {
-                            if (countdownText == "TAP FAST!") {
-                                rotationAngle -= 1f
-                                score += 1
-                                if (score >= 100) {
-                                    countdownText = "You Win! Tap to Restart"
-                                    allowRestart = true
-                                    score = 100
-                                }
-                            }
+                        if(!gameViewModel.gameStarted){
+                            gameViewModel.startGame()
+                        }else{
+                            gameViewModel.tapGameBox()
                         }
                     }
             ){
                 Text(
-                    text = if(gameStarted) countdownText else "Tap to Start",
+                    text = gameViewModel.countdownText,
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
                     textAlign = TextAlign.Center,
@@ -175,12 +135,11 @@ fun GameScreen(navController: NavController){
             }
             Row (){
                 Button(onClick = {
-                    gameStarted = false
-                    allowRestart = false
+                    gameViewModel.restartGame()
                 }, modifier = Modifier
                     .weight(1f)
                     .padding(2.dp),
-                    enabled = allowRestart
+                    enabled = gameViewModel.allowRestart
                 ){
                     Text(
                         text = "RESTART",
@@ -207,5 +166,7 @@ fun GameScreen(navController: NavController){
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ScreenPreview(){
-    GameScreen(rememberNavController())
+    val navController = rememberNavController()
+    val gameViewModel: GameViewModel = viewModel()
+    GameScreen(navController, gameViewModel)
 }
