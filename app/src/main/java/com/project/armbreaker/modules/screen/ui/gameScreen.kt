@@ -2,6 +2,7 @@ package com.project.armbreaker.modules.screen.ui
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,27 +25,25 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.getDrawable
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.request.RequestOptions
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.project.armbreaker.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GameScreen(navController: NavController){
     var score by remember { mutableStateOf(0) }
@@ -90,11 +89,17 @@ fun GameScreen(navController: NavController){
             .statusBarsPadding()
             .navigationBarsPadding()
     ){
+
         //Background GIF from drawable using Glide dependency
-        GlideImage(
-            model = R.drawable.game_background, // Uses game_background.gif from drawable as background
-            contentDescription = "Game Background",
-            modifier = Modifier.fillMaxSize(),
+        Image(
+            modifier = Modifier,   //crops the image to circle shape
+            painter = rememberDrawablePainter(
+                drawable = getDrawable(
+                    LocalContext.current,
+                    R.drawable.game_background
+                )
+            ),
+            contentDescription = "Loading animation",
             contentScale = ContentScale.Crop,
         )
 
