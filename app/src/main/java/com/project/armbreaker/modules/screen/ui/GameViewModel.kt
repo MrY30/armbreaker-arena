@@ -34,7 +34,7 @@ class GameViewModel: ViewModel(){
                     rotationAngle += 5f
                     score -= 5
                     if (score <= -50) {
-                        countdownText = "You Lose! Tap to Restart"
+                        countdownText = "You Lose!"
                         allowRestart = true
                         score = -50
                     }
@@ -47,10 +47,10 @@ class GameViewModel: ViewModel(){
         if (gameStarted && countdownText == "TAP FAST!") {
             rotationAngle -= 1f
             score += 1
-            if (score >= 100) {
-                countdownText = "You Win! Tap to Restart"
+            if (score >= 50) {
+                countdownText = "You Win!"
                 allowRestart = true
-                score = 100
+                score = 50
             }
         }
     }

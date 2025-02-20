@@ -13,10 +13,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -131,15 +137,43 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             }
 
             //Belt Level Image
-            Image(
+            Box(
                 modifier = Modifier
-                    .weight(3f)
                     .fillMaxSize()
-                    //.border(1.dp, Color.Black)
-                    .wrapContentHeight(Alignment.CenterVertically),
-                painter = painterResource(id = R.drawable.belt_level),
-                contentDescription = "Belt Level",
-                contentScale = ContentScale.FillWidth
+                    .weight(3f)
+            ){
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    painter = painterResource(id = R.drawable.belt_level),
+                    contentDescription = "Belt Level",
+                    contentScale = ContentScale.FillWidth
+                )
+
+                PixelatedCircle(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .align(Alignment.Center)
+                        .offset(x = (-2).dp, y = (-10).dp),
+                    circleColor = Color.Yellow,
+                    gridSize = 35
+                )
+                PixelatedCircle(
+                    modifier = Modifier
+                        .size(105.dp)
+                        .align(Alignment.Center)
+                        .offset(x = (-2).dp, y = (-10).dp),
+                    circleColor = Color.Red,
+                    gridSize = 35
+                )
+
+            }
+
+            //Progress Bar
+            ProgressBar(0.5f, modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
             )
 
             //Arm Level Image
@@ -151,7 +185,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     .wrapContentHeight(Alignment.CenterVertically)
                     .graphicsLayer(
                         rotationZ = animateArm,
-                        transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1.0f)
+                        transformOrigin = TransformOrigin(pivotFractionX = 0.85f, pivotFractionY = 1.0f)
                     ),
                 painter = painterResource(id = R.drawable.arm_player),
                 contentDescription = "Arm Player",
