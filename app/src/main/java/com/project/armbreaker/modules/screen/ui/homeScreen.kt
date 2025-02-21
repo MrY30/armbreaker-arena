@@ -88,6 +88,18 @@ fun HomeScreen(navController: NavController){
                     fontSize = 20.sp
                 )
             }
+            Button(onClick = {
+                navController.navigate("about")
+            }, modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(2.dp)
+            ){
+                Text(
+                    text = "About",
+                    fontSize = 20.sp
+                )
+            }
         }
     }
 }

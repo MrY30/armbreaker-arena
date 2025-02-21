@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.GameScreen
 import com.project.armbreaker.modules.screen.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.HomeScreen
@@ -31,6 +32,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("options"){
                     OptionsScreen(navController = navController)
+                }
+                composable("about"){
+                    AboutScreen(navController = navController)
                 }
                 composable("game") {
                     val gameViewModel: GameViewModel = viewModel()
