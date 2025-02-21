@@ -23,6 +23,10 @@ fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
 
+    // Temporary hardcoded username and password
+    val validUsername = "user"
+    val validPassword = "user1"
+
     // Stores the account data temporarily in memory
     val accounts = remember { mutableStateOf(mutableMapOf<String, String>()) }
 
@@ -86,8 +90,8 @@ fun LoginScreen(navController: NavController) {
         Button(
             onClick = {
                 if (isLogin) {
-                    // Handle login
-                    if (accounts.value.containsKey(username) && accounts.value[username] == password) {
+                    // Handle login with temporary credentials
+                    if (username == validUsername && password == validPassword) {
                         Toast.makeText(navController.context, "Login Successful", Toast.LENGTH_SHORT).show()
                         navController.navigate("home") // Navigate to home screen
                     } else {
