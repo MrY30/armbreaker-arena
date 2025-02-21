@@ -22,6 +22,7 @@ fun LoginScreen(navController: NavController) {
     var isLogin by remember { mutableStateOf(true) }
     var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
+    var errorText by remember { mutableStateOf("") }
 
     // Temporary hardcoded username and password
     val validUsername = "user"
@@ -86,16 +87,27 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Show error text if login fails
+        if (errorText.isNotEmpty()) {
+            Text(
+                text = errorText,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         // Login or Signup Button
         Button(
             onClick = {
+                errorText = "" // Reset the error message before each attempt
                 if (isLogin) {
                     // Handle login with temporary credentials
                     if (username == validUsername && password == validPassword) {
-                        Toast.makeText(navController.context, "Login Successful", Toast.LENGTH_SHORT).show()
                         navController.navigate("home") // Navigate to home screen
                     } else {
-                        Toast.makeText(navController.context, "Invalid username or password", Toast.LENGTH_SHORT).show()
+                        errorText = "Invalid username or password"
                     }
                 } else {
                     // Handle signup
@@ -104,11 +116,10 @@ fun LoginScreen(navController: NavController) {
                         accounts.value[username] = password // This is just a temporary storage for simplicity
                         // You can store other information as needed (e.g., email, phone)
 
-                        Toast.makeText(navController.context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
                         isLogin = true // Switch to login after signup
                         navController.navigate("home") // Navigate to home screen after signup
                     } else {
-                        Toast.makeText(navController.context, "Please fill out all fields", Toast.LENGTH_SHORT).show()
+                        errorText = "Please fill out all fields"
                     }
                 }
             },
