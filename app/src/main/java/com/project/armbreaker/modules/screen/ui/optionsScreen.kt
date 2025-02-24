@@ -38,7 +38,7 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.game_background),//Kay wala pa ko mabutang
+            painter = painterResource(id = R.drawable.game_background_placeholder),//Kay wala pa ko mabutang
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -67,42 +67,7 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                 )
 
 
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Audio Settings")
-                }
 
-                Button(
-                    onClick = {  },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Video Settings")
-                }
-
-                Button(
-                    onClick = {  },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Control Settings")
-                }
-
-                Button(
-                    onClick = {  },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Gameplay Settings")
-                }
-
-                Button(
-                    onClick = {
-                        navController.navigate("home")
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = "Back")
-                }
 
 
 
@@ -131,6 +96,15 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                     modifier = Modifier.fillMaxWidth()
                 )
 
+
+                Button(
+                    onClick = {
+                        navController.navigate("home")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = "Back")
+                }
 
             }
         }
