@@ -38,7 +38,7 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),//Kay wala pa ko mabutang
+            painter = painterResource(id = R.drawable.game_background),//Kay wala pa ko mabutang
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
