@@ -1,5 +1,8 @@
 package com.project.armbreaker.modules.screen.ui
 
+import android.app.Activity
+import android.app.AlertDialog
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,16 +17,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ComponentActivity
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun HomeScreen(navController: NavController){
+
+    //This is also for the exit feature
+    val activity = LocalActivity.current
+
+
     Box (
         modifier = Modifier
             .fillMaxSize()
@@ -100,9 +110,36 @@ fun HomeScreen(navController: NavController){
                     fontSize = 20.sp
                 )
             }
+
+
+            // EXIT BUTTON
+            Button(
+                onClick = { showExitDialog(activity) },
+                modifier = Modifier.fillMaxWidth().padding(2.dp)
+            ) {
+                Text(text = "EXIT", fontSize = 20.sp)
+            }
+
         }
     }
 }
+
+
+//This is for the exit feature
+fun showExitDialog(activity: Activity?) {
+    activity?.let {
+        AlertDialog.Builder(it)
+            .setTitle("Exit Game")
+            .setMessage("Are you sure you want to exit?")
+            .setPositiveButton("Yes") { _, _ ->
+                it.finish() // Close the app
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+}
+
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
