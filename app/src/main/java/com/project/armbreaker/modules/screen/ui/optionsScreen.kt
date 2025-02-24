@@ -1,5 +1,6 @@
 package com.project.armbreaker.modules.screen.ui
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -28,7 +29,8 @@ import com.project.armbreaker.R
 
 //Unfinished (Fully Static)
 @Composable
-fun OptionsScreen(navController: NavController) {
+fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
+ {
 
     var volume by remember { mutableStateOf(0.5f) } // Initial value at 50%
     var isVolumeOn by remember { mutableStateOf(true) }
@@ -121,6 +123,35 @@ fun OptionsScreen(navController: NavController) {
                 ) {
                     Text(text = "Back")
                 }
+
+
+
+
+                Button(
+                    onClick = {
+                        if (isVolumeOn) {
+                            mediaPlayer?.pause()
+                        } else {
+                            mediaPlayer?.start()
+                        }
+                        isVolumeOn = !isVolumeOn
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(text = if (isVolumeOn) "Mute Music" else "Play Music")
+                }
+
+                Slider(
+                    value = volume,
+                    onValueChange = { newVolume ->
+                        volume = newVolume
+                        mediaPlayer?.setVolume(newVolume, newVolume) // Adjust volume
+                    },
+                    valueRange = 0f..1f,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
             }
         }
     }
@@ -129,5 +160,5 @@ fun OptionsScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun GameSettingsScreenPreview() {
-    OptionsScreen(rememberNavController())
+    //OptionsScreen(rememberNavController())
 }

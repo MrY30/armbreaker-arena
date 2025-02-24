@@ -14,13 +14,28 @@ import com.project.armbreaker.modules.screen.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.screen.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
+import android.media.MediaPlayer
+import android.content.Context
 
 class MainActivity : ComponentActivity() {
     //@SuppressLint("WrongConstant", "NewApi")
+
+    private var mediaPlayer: MediaPlayer? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
+        //For audio ni
+        mediaPlayer = MediaPlayer.create(this, R.raw.bg_music)
+        mediaPlayer?.isLooping = true // Loop the background music
+        mediaPlayer?.start()
+
+
+
+
+
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "home") {
@@ -31,7 +46,7 @@ class MainActivity : ComponentActivity() {
                     HomeScreen(navController = navController)
                 }
                 composable("options"){
-                    OptionsScreen(navController = navController)
+                    OptionsScreen(navController = navController, mediaPlayer)
                 }
                 composable("about"){
                     AboutScreen(navController = navController)
@@ -44,4 +59,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    //For audio pud ni
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release() // Release resources when activity is destroyed
+        mediaPlayer = null
+    }
+
 }
