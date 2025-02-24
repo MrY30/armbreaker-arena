@@ -20,7 +20,8 @@ import android.content.Context
 class MainActivity : ComponentActivity() {
     //@SuppressLint("WrongConstant", "NewApi")
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var generalMediaPlayer: MediaPlayer? = null
+    private var gameMediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +29,13 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         //For audio ni
-        mediaPlayer = MediaPlayer.create(this, R.raw.bg_music)
-        mediaPlayer?.isLooping = true // Loop the background music
-        mediaPlayer?.start()
+        generalMediaPlayer = MediaPlayer.create(this, R.raw.bg_music_general)
+        gameMediaPlayer = MediaPlayer.create(this, R.raw.bg_music_game)
+
+        generalMediaPlayer?.isLooping = true
+        gameMediaPlayer?.isLooping = true
+
+        generalMediaPlayer?.start()
 
 
 
@@ -40,18 +45,23 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "home") {
                 composable("login") {
+                    playGeneralMusic()
                     LoginScreen(navController = navController)
                 }
                 composable("home") {
+                    playGeneralMusic()
                     HomeScreen(navController = navController)
                 }
                 composable("options"){
-                    OptionsScreen(navController = navController, mediaPlayer)
+                    playGeneralMusic()
+                    OptionsScreen(navController = navController, generalMediaPlayer)
                 }
                 composable("about"){
+                    playGeneralMusic()
                     AboutScreen(navController = navController)
                 }
                 composable("game") {
+                    playGameMusic()
                     val gameViewModel: GameViewModel = viewModel()
                     GameScreen(navController = navController, gameViewModel = gameViewModel)
                     //OldGameScreen(navController = navController)
@@ -61,10 +71,32 @@ class MainActivity : ComponentActivity() {
     }
 
     //For audio pud ni
+    private fun playGeneralMusic() {
+        if (gameMediaPlayer?.isPlaying == true) {
+            gameMediaPlayer?.pause()
+            gameMediaPlayer?.seekTo(0)
+        }
+        if (generalMediaPlayer?.isPlaying == false) {
+            generalMediaPlayer?.start()
+        }
+    }
+
+    private fun playGameMusic() {
+        if (generalMediaPlayer?.isPlaying == true) {
+            generalMediaPlayer?.pause()
+            generalMediaPlayer?.seekTo(0)
+        }
+        if (gameMediaPlayer?.isPlaying == false) {
+            gameMediaPlayer?.start()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release() // Release resources when activity is destroyed
-        mediaPlayer = null
+        generalMediaPlayer?.release()
+        gameMediaPlayer?.release()
+        generalMediaPlayer = null
+        gameMediaPlayer = null
     }
 
 }
