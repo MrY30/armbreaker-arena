@@ -65,27 +65,7 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.White
                 )
-                // Volume control using a slider
-                Text(text = "Volume", color = Color.White)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = if (isVolumeOn) "On" else "Off", color = Color.White)
-                    Switch(
-                        checked = isVolumeOn,
-                        onCheckedChange = { isVolumeOn = it },  // Toggle the state
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-                }
-                Slider(
-                    value = volume,
-                    onValueChange = { newVolume ->
-                        volume = newVolume // Update the volume state
-                    },
-                    valueRange = 0f..1f,
-                    modifier = Modifier.fillMaxWidth()
-                )
+
 
                 Button(
                     onClick = {},
