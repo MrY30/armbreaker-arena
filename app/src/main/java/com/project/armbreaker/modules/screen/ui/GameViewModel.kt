@@ -30,7 +30,7 @@ class GameViewModel: ViewModel(){
                 while (countdownText == "TAP FAST!") {
                     delay(100) //Increasing Level, Increasing Difficulty
                     rotationAngle += 1f //Increasing Level, Increasing Difficulty
-                    if (rotationAngle >= 40f) {
+                    if (rotationAngle >= 35f) {
                         countdownText = "You Lose!"
                         allowRestart = true
                     }
@@ -42,7 +42,7 @@ class GameViewModel: ViewModel(){
     fun tapGameBox() {
         if (gameStarted && countdownText == "TAP FAST!") {
             rotationAngle -= 1f
-            if (rotationAngle <= -30f) {
+            if (rotationAngle <= -35f) {
                 countdownText = "You Win!"
                 allowRestart = true
             }

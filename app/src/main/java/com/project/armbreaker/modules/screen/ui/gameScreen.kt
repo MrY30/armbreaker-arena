@@ -70,7 +70,6 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     gameViewModel.tapGameBox()
                 }
             }
-            //.navigationBarsPadding()
     ){
         //Adding the Background Crowd GIF
         //Note: This is not working in the Preview. Comment this area if you want to see the preview
@@ -171,21 +170,33 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     gridSize = 35
                 )
                 //Level Text
-                Text(
-                    text = gameViewModel.rotationAngle.toString(),
-                    textAlign = TextAlign.Center,
-                    fontSize = 50.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                Column(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .offset(x = (-2).dp, y = (-9).dp)
-                )
+                        .fillMaxSize()
+                        .wrapContentSize(Alignment.Center),
+                ) {
+                    Text(
+                        text = "LEVEL",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+                    Text(
+                        text = gameViewModel.rotationAngle.toString(),
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        fontSize = 45.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+                }
 
             }
 
             //Progress Bar
-            ProgressBar(progress = 0.5f, modifier = Modifier
+            ProgressBar(progress = (1-((gameViewModel.rotationAngle)+35)/70), modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
             )
