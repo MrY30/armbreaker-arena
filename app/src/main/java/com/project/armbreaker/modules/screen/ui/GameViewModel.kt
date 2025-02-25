@@ -9,7 +9,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GameViewModel: ViewModel(){
-    var score by mutableStateOf(0)
     var gameStarted by mutableStateOf(false)
     var countdownText by mutableStateOf("Tap to Start")
     var allowRestart by mutableStateOf(false)
@@ -17,7 +16,6 @@ class GameViewModel: ViewModel(){
 
     fun startGame() {
         if (!gameStarted) {
-            score = 0
             rotationAngle = 0f
             gameStarted = true
             countdownText = "3"
@@ -30,13 +28,11 @@ class GameViewModel: ViewModel(){
                 }
                 countdownText = "TAP FAST!"
                 while (countdownText == "TAP FAST!") {
-                    delay(1000)
-                    rotationAngle += 5f
-                    score -= 5
-                    if (score <= -50) {
+                    delay(100) //Increasing Level, Increasing Difficulty
+                    rotationAngle += 1f //Increasing Level, Increasing Difficulty
+                    if (rotationAngle >= 40f) {
                         countdownText = "You Lose!"
                         allowRestart = true
-                        score = -50
                     }
                 }
             }
@@ -46,11 +42,9 @@ class GameViewModel: ViewModel(){
     fun tapGameBox() {
         if (gameStarted && countdownText == "TAP FAST!") {
             rotationAngle -= 1f
-            score += 1
-            if (score >= 50) {
+            if (rotationAngle <= -30f) {
                 countdownText = "You Win!"
                 allowRestart = true
-                score = 50
             }
         }
     }
@@ -59,7 +53,6 @@ class GameViewModel: ViewModel(){
         gameStarted = false
         allowRestart = false
         countdownText = "Tap to Start"
-        score = 0
         rotationAngle = 0f
     }
 }

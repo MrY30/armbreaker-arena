@@ -60,7 +60,6 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
     Box (
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
             .clickable (
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -74,6 +73,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             //.navigationBarsPadding()
     ){
         //Adding the Background Crowd GIF
+        //Note: This is not working in the Preview. Comment this area if you want to see the preview
         AndroidView(
             modifier = Modifier.fillMaxSize(),
             factory = { context ->
@@ -100,7 +100,8 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
 
         //Foreground UI Composable
         Column (
-            modifier = Modifier,
+            modifier = Modifier
+                .statusBarsPadding(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
@@ -142,6 +143,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     .fillMaxSize()
                     .weight(3f)
             ){
+                //This is the belt level image
                 Image(
                     modifier = Modifier
                         .fillMaxSize()
@@ -150,7 +152,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     contentDescription = "Belt Level",
                     contentScale = ContentScale.FillWidth
                 )
-
+                //Outer Border Circle
                 PixelatedCircle(
                     modifier = Modifier
                         .size(120.dp)
@@ -159,6 +161,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     circleColor = Color.Yellow,
                     gridSize = 35
                 )
+                //Inner Circle
                 PixelatedCircle(
                     modifier = Modifier
                         .size(105.dp)
@@ -167,11 +170,22 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     circleColor = Color.Red,
                     gridSize = 35
                 )
+                //Level Text
+                Text(
+                    text = gameViewModel.rotationAngle.toString(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 50.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(x = (-2).dp, y = (-9).dp)
+                )
 
             }
 
             //Progress Bar
-            ProgressBar(0.5f, modifier = Modifier
+            ProgressBar(progress = 0.5f, modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
             )
@@ -183,11 +197,12 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     .fillMaxSize()
                     //.border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
+                    .offset(y = 60.dp)
                     .graphicsLayer(
                         rotationZ = animateArm,
                         transformOrigin = TransformOrigin(pivotFractionX = 0.85f, pivotFractionY = 1.0f)
                     ),
-                painter = painterResource(id = R.drawable.arm_player),
+                painter = painterResource(id = R.drawable.arm_player_v2),
                 contentDescription = "Arm Player",
                 contentScale = ContentScale.Fit
             )
