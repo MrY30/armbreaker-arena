@@ -1,44 +1,54 @@
 package com.project.armbreaker.modules.screen.ui
 
+import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.R
 
-
-//Unfinished (Fully Static)
 @Composable
-fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
- {
-
+fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?) {
+    val context = LocalContext.current
     var volume by remember { mutableStateOf(0.5f) } // Initial value at 50%
     var isVolumeOn by remember { mutableStateOf(true) }
 
+    // List of available music tracks
+    val musicTracks = listOf(
+        "Default" to R.raw.bg_music_general,
+        "Battle Mode" to R.raw.bg_music_game,
+//        "Chill Mode" to R.raw.bg_music_chill,
+//        "Epic Adventure" to R.raw.bg_music_epic
+    )
+
+    var selectedTrack by remember { mutableStateOf(musicTracks[0]) }
+    var currentMediaPlayer by remember { mutableStateOf(mediaPlayer) }
+
+    // Function to switch music
+    fun switchMusic(context: Context, trackResId: Int) {
+        currentMediaPlayer?.release() // Stop and release the old player
+        currentMediaPlayer = MediaPlayer.create(context, trackResId)
+        currentMediaPlayer?.isLooping = true
+        currentMediaPlayer?.setVolume(volume, volume)
+        if (isVolumeOn) currentMediaPlayer?.start()
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource(id = R.drawable.game_background_placeholder),//Kay wala pa ko mabutang
+            painter = painterResource(id = R.drawable.game_background_placeholder),
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -66,18 +76,40 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                     color = Color.White
                 )
 
+                // Dropdown for music selection
+                var expanded by remember { mutableStateOf(false) }
 
+                Box {
+                    Button(
+                        onClick = { expanded = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Music: ${selectedTrack.first}")
+                    }
 
-
-
-
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        musicTracks.forEach { track ->
+                            DropdownMenuItem(
+                                text = { Text(track.first) },
+                                onClick = {
+                                    selectedTrack = track
+                                    switchMusic(context, track.second)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Button(
                     onClick = {
                         if (isVolumeOn) {
-                            mediaPlayer?.pause()
+                            currentMediaPlayer?.pause()
                         } else {
-                            mediaPlayer?.start()
+                            currentMediaPlayer?.start()
                         }
                         isVolumeOn = !isVolumeOn
                     },
@@ -90,12 +122,11 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                     value = volume,
                     onValueChange = { newVolume ->
                         volume = newVolume
-                        mediaPlayer?.setVolume(newVolume, newVolume) // Adjust volume
+                        currentMediaPlayer?.setVolume(newVolume, newVolume)
                     },
                     valueRange = 0f..1f,
                     modifier = Modifier.fillMaxWidth()
                 )
-
 
                 Button(
                     onClick = {
@@ -105,7 +136,6 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
                 ) {
                     Text(text = "Back")
                 }
-
             }
         }
     }
@@ -114,5 +144,5 @@ fun OptionsScreen(navController: NavController, mediaPlayer: MediaPlayer?)
 @Preview(showBackground = true)
 @Composable
 fun GameSettingsScreenPreview() {
-    //OptionsScreen(rememberNavController())
+    // OptionsScreen(rememberNavController(), null)
 }
