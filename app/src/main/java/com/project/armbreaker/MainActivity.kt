@@ -12,10 +12,9 @@ import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.GameScreen
 import com.project.armbreaker.modules.screen.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.HomeScreen
-import com.project.armbreaker.modules.screen.ui.LoginScreen
+import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 import android.media.MediaPlayer
-import android.content.Context
 
 class MainActivity : ComponentActivity() {
     //@SuppressLint("WrongConstant", "NewApi")

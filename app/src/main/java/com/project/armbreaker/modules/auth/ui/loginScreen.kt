@@ -1,9 +1,6 @@
 //Unfinished (Semi Static)
-package com.project.armbreaker.modules.screen.ui
+package com.project.armbreaker.modules.auth.ui
 
-import android.content.Context
-import android.os.Bundle
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
