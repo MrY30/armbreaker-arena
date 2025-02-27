@@ -39,3 +39,7 @@ val pixelGame = FontFamily(
     Font(R.font.pixel_game, FontWeight.Normal),
     Font(R.font.pixel_game_extrude, FontWeight.Bold)
 )
+
+val thaleahFat = FontFamily(
+    Font(R.font.thaleah_fat, FontWeight.Normal)
+)

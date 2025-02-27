@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.ui.theme.pixelGame
+import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
 fun HomeScreen(navController: NavController, ){
@@ -63,8 +65,9 @@ fun HomeScreen(navController: NavController, ){
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
             ) {
-                TitleLayout("ARMBREAKER")
-                TitleLayout("ARENA")
+                //Font to be decided
+                TitleLayout("ARMBREAKER", thaleahFat)
+                TitleLayout("ARMBREAKER", pixelGame)
             }
             Column(
                 modifier = Modifier
@@ -137,7 +140,7 @@ fun ButtonLayout(text:String, modifier: Modifier = Modifier, onClick: () -> Unit
     ){
         Text(
             text = text,
-            fontFamily = pixelGame,
+            fontFamily = thaleahFat,
             fontSize = 30.sp,
             color = Color.Black
         )
@@ -145,14 +148,14 @@ fun ButtonLayout(text:String, modifier: Modifier = Modifier, onClick: () -> Unit
 }
 
 @Composable
-fun TitleLayout(text:String){
+fun TitleLayout(text:String, fontFamily: FontFamily){
     Box(
         modifier = Modifier.fillMaxWidth(), // Allows centering
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
-            fontFamily = pixelGame,
+            fontFamily = fontFamily,
             fontWeight = FontWeight.Bold,
             fontSize = 70.sp,
             textAlign = TextAlign.Center,
@@ -169,7 +172,7 @@ fun TitleLayout(text:String){
         )
         Text(
             text = text,
-            fontFamily = pixelGame,
+            fontFamily = fontFamily,
             fontWeight = FontWeight.Normal,
             fontSize = 70.sp,
             textAlign = TextAlign.Center,
