@@ -32,7 +32,7 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
 
     fun logout() {
         //Firebase.auth.signOut()
-
+        authRepository.logout()
         _uiState.update { currentState
             ->
             currentState.copy(
@@ -53,10 +53,11 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
             }
     }
 
-    fun signInUserWithEmailAndPassword(email: String, password: String) {
+    fun signInWithEmail(email: String, password: String) {
         Firebase.auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    Log.w("FIREBASE_REGISTER", "SUCCESS")
                     val currentUser = task.result.user
 
                     _uiState.update { currentState

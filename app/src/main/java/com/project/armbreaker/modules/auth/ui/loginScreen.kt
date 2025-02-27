@@ -6,18 +6,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.project.armbreaker.modules.auth.data.AuthRepository
+import com.project.armbreaker.modules.auth.data.AuthRepositoryInterface
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel
+) {
     var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
-    var email by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
     var errorText by remember { mutableStateOf("") }
 
@@ -27,6 +31,11 @@ fun LoginScreen(navController: NavController) {
 
     // Stores the account data temporarily in memory
     val accounts = remember { mutableStateOf(mutableMapOf<String, String>()) }
+
+    //Applying authentications From Firebase
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val appContext = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -42,9 +51,9 @@ fun LoginScreen(navController: NavController) {
 
         // Username input
         TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email Address") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -65,9 +74,9 @@ fun LoginScreen(navController: NavController) {
         if (!isLogin) {
             // Email input
             TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email Address") },
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -101,11 +110,13 @@ fun LoginScreen(navController: NavController) {
                 errorText = "" // Reset the error message before each attempt
                 if (isLogin) {
                     // Handle login with temporary credentials
-                    if (username == validUsername && password == validPassword) {
-                        navController.navigate("home") // Navigate to home screen
-                    } else {
-                        errorText = "Invalid username or password"
-                    }
+//                    if (username == validUsername && password == validPassword) {
+//                        navController.navigate("home") // Navigate to home screen
+//                    } else {
+//                        errorText = "Invalid username or password"
+//                    }
+                    //Trying Email authentication using Google Firebase
+                    authViewModel.signInWithEmail(email,password)
                 } else {
                     // Handle signup
                     if (username.isNotBlank() && password.isNotBlank() && email.isNotBlank() && phoneNumber.isNotBlank()) {
@@ -122,7 +133,7 @@ fun LoginScreen(navController: NavController) {
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(text = if (isLogin) "Login" else "Sign Up")
+           Text(text = if (isLogin) "Login" else "Sign Up")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -134,8 +145,8 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginScreen() {
-    LoginScreen(navController = rememberNavController())
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewLoginScreen() {
+//    LoginScreen(navController = rememberNavController(), /*authViewModel = AuthViewModel(authRepository = AuthRepository())*/)
+//}

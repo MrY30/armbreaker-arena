@@ -26,9 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ComponentActivity
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.project.armbreaker.modules.auth.ui.AuthViewModel
 
 @Composable
-fun HomeScreen(navController: NavController){
+fun HomeScreen(navController: NavController, authViewModel: AuthViewModel){
 
     //This is also for the exit feature
     val activity = LocalActivity.current
@@ -62,6 +63,18 @@ fun HomeScreen(navController: NavController){
                     //.border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
             )
+            Button(onClick = { //LOG OUT BUTTON
+                authViewModel.logout()
+            }, modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(2.dp)
+            ){
+                Text(
+                    text = "LOG OUT",
+                    fontSize = 20.sp
+                )
+            }
             Button(onClick = {
                 navController.navigate("game")
             }, modifier = Modifier
@@ -141,8 +154,8 @@ fun showExitDialog(activity: Activity?) {
 
 
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun previewHomeScreen(){
-    HomeScreen(rememberNavController())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun previewHomeScreen(){
+//    HomeScreen(rememberNavController())
+//}

@@ -15,6 +15,11 @@ import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 import android.media.MediaPlayer
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.project.armbreaker.modules.auth.data.AuthRepository
+import com.project.armbreaker.modules.auth.ui.AuthViewModel
+import com.project.armbreaker.ui.theme.ArmbreakerArenaTheme
 
 class MainActivity : ComponentActivity() {
     //@SuppressLint("WrongConstant", "NewApi")
@@ -36,20 +41,27 @@ class MainActivity : ComponentActivity() {
 
         generalMediaPlayer?.start()
 
-
-
-
-
         setContent {
+            //Applying AuthViewModel
+            val authViewModel = AuthViewModel(authRepository = AuthRepository())
+            val authState by authViewModel.uiState.collectAsState()
+            val authEmail = authState.email
             val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = "home") {
+
+            NavHost(
+                navController = navController,
+                startDestination = if (authEmail.isNullOrEmpty()) "login" else "home"
+            ) {
                 composable("login") {
                     playGeneralMusic()
-                    LoginScreen(navController = navController)
+                    LoginScreen(
+                        navController = navController,
+                        authViewModel = authViewModel
+                    )
                 }
                 composable("home") {
                     playGeneralMusic()
-                    HomeScreen(navController = navController)
+                    HomeScreen(navController = navController, authViewModel = authViewModel)
                 }
                 composable("options"){
                     playGeneralMusic()
@@ -63,7 +75,6 @@ class MainActivity : ComponentActivity() {
                     playGameMusic()
                     val gameViewModel: GameViewModel = viewModel()
                     GameScreen(navController = navController, gameViewModel = gameViewModel)
-                    //OldGameScreen(navController = navController)
                 }
             }
         }
