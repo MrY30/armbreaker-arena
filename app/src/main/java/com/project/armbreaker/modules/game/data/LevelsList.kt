@@ -1,4 +1,4 @@
-package com.project.armbreaker.modules.screen.data
+package com.project.armbreaker.modules.game.data
 
 class LevelsList {
     fun loadLevels(): List<GameDataSource> {

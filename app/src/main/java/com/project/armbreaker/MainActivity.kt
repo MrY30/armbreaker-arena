@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("home") {
                     playGeneralMusic()
-                    HomeScreen(navController = navController, authViewModel = authViewModel)
+                    HomeScreen(navController = navController, /*authViewModel = authViewModel*/)
                 }
                 composable("options"){
                     playGeneralMusic()
