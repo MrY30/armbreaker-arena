@@ -29,7 +29,7 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
             }
         }
     }
-
+    //hello try
     fun logout() {
         //Firebase.auth.signOut()
         authRepository.logout()
