@@ -41,6 +41,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.project.armbreaker.R
+import com.project.armbreaker.ui.theme.pixelGame
+import com.project.armbreaker.ui.theme.thaleahFat
 
 
 @Composable
@@ -116,7 +118,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 ){
                     Text(
                         text = "Restart",
-                        fontSize = 20.sp
+                        fontSize = 20.sp,
                     )
                 }
                 Button(onClick = {
@@ -173,18 +175,20 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 ) {
                     Text(
                         text = "LEVEL",
+                        fontFamily = thaleahFat,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 35.sp,
+                        fontWeight = FontWeight.Normal,
                         color = Color.White,
                     )
                     Text(
-                        text = gameViewModel.rotationAngle.toString(),
+                        text = "100",
+                        fontFamily = pixelGame,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontSize = 45.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 50.sp,
+                        fontWeight = FontWeight.Normal,
                         color = Color.White,
                     )
                 }
@@ -224,6 +228,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             ){
                 Text(
                     text = gameViewModel.countdownText,
+                    fontFamily = thaleahFat,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 40.sp,
