@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "164219022594",
+    "project_id": "armbreaker-arena",
+    "storage_bucket": "armbreaker-arena.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:164219022594:android:54630971adc3748d50261b",
+        "android_client_info": {
+          "package_name": "com.project.armbreaker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIDdkCbO9xEMbXBm4opnhg7-NMDT6vlJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
