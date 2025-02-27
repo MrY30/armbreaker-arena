@@ -1,25 +1,24 @@
 package com.project.armbreaker
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.project.armbreaker.modules.screen.ui.AboutScreen
-import com.project.armbreaker.modules.game.ui.GameScreen
-import com.project.armbreaker.modules.game.ui.GameViewModel
-import com.project.armbreaker.modules.screen.ui.HomeScreen
-import com.project.armbreaker.modules.auth.ui.LoginScreen
-import com.project.armbreaker.modules.screen.ui.OptionsScreen
-import android.media.MediaPlayer
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
-import com.project.armbreaker.ui.theme.ArmbreakerArenaTheme
+import com.project.armbreaker.modules.auth.ui.LoginScreen
+import com.project.armbreaker.modules.game.ui.GameScreen
+import com.project.armbreaker.modules.game.ui.GameViewModel
+import com.project.armbreaker.modules.screen.ui.AboutScreen
+import com.project.armbreaker.modules.screen.ui.HomeScreen
+import com.project.armbreaker.modules.screen.ui.OptionsScreen
 
 class MainActivity : ComponentActivity() {
     //@SuppressLint("WrongConstant", "NewApi")
@@ -61,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("home") {
                     playGeneralMusic()
-                    HomeScreen(navController = navController, /*authViewModel = authViewModel*/)
+                    HomeScreen(navController = navController, authViewModel = authViewModel)
                 }
                 composable("options"){
                     playGeneralMusic()

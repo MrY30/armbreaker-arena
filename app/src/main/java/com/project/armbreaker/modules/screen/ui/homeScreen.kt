@@ -11,10 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,32 +18,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ShaderBrush
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ComponentActivity
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
-fun HomeScreen(navController: NavController, ){
-
+fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
     //This is also for the exit feature
     val activity = LocalActivity.current
-
 
     Box (
         modifier = Modifier
@@ -76,7 +63,7 @@ fun HomeScreen(navController: NavController, ){
                 verticalArrangement = Arrangement.Center,
             ){
                 ButtonLayout("LOG OUT"){
-                    //authViewModel.logout()
+                    authViewModel.logout()
                 }
                 ButtonLayout("PLAY"){
                     navController.navigate("game")
@@ -114,7 +101,7 @@ fun showExitDialog(activity: Activity?) {
 }
 
 @Composable
-fun ButtonLayout(text:String, modifier: Modifier = Modifier, onClick: () -> Unit = {}){
+fun ButtonLayout(text:String, onClick: () -> Unit = {}){
     Button(onClick = { //LOG OUT BUTTON
         //authViewModel.logout()
         onClick()
@@ -181,8 +168,8 @@ fun TitleLayout(text:String, fontFamily: FontFamily){
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewHomeScreen(){
-    HomeScreen(rememberNavController())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun PreviewHomeScreen(){
+//    HomeScreen(rememberNavController())
+//}
