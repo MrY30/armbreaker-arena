@@ -9,8 +9,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.modules.screen.ui.AboutScreen
-import com.project.armbreaker.modules.screen.ui.GameScreen
-import com.project.armbreaker.modules.screen.ui.GameViewModel
+import com.project.armbreaker.modules.game.ui.GameScreen
+import com.project.armbreaker.modules.game.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen

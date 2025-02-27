@@ -1,4 +1,4 @@
-package com.project.armbreaker.modules.screen.ui
+package com.project.armbreaker.modules.game.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview

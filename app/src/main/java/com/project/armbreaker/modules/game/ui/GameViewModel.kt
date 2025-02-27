@@ -1,4 +1,4 @@
-package com.project.armbreaker.modules.screen.ui
+package com.project.armbreaker.modules.game.ui
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

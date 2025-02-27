@@ -1,4 +1,4 @@
-package com.project.armbreaker.modules.screen.ui
+package com.project.armbreaker.modules.game.ui
 
 import android.widget.ImageView
 import androidx.compose.animation.core.animateFloatAsState
