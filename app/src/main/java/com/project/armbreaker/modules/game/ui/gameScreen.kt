@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -32,9 +34,11 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -71,19 +75,19 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
     ){
         //Adding the Background Crowd GIF
         //Note: This is not working in the Preview. Comment this area if you want to see the preview
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = { context ->
-                ImageView(context).apply {
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                    Glide.with(context)
-                        .asGif()
-                        .load(R.drawable.game_background)
-                        .placeholder(R.drawable.game_background_placeholder)
-                        .into(this)
-                }
-            }
-        )
+//        AndroidView(
+//            modifier = Modifier.fillMaxSize(),
+//            factory = { context ->
+//                ImageView(context).apply {
+//                    scaleType = ImageView.ScaleType.CENTER_CROP
+//                    Glide.with(context)
+//                        .asGif()
+//                        .load(R.drawable.game_background)
+//                        .placeholder(R.drawable.game_background_placeholder)
+//                        .into(this)
+//                }
+//            }
+//        )
 
         //Adding the Enemy Layer Image
         Image(
@@ -218,10 +222,10 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 contentScale = ContentScale.Fit
             )
         }
-
+        //All conditions including Pause, Win, Lose
         if(gameViewModel.countdownText != "TAP FAST!"){
             //STARTING BOX. CLICK TO START COUNTDOWN
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Black.copy(alpha = 0.75f))
@@ -235,9 +239,43 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
+                        .weight(1f)
                         .border(1.dp, Color.Black)
-                        .wrapContentHeight(Alignment.CenterVertically)
+                        .wrapContentHeight(Alignment.Bottom)
                 )
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Spacer(modifier = Modifier.size(120.dp))
+                    ButtonLayout(
+                        image = R.drawable.green_button,
+                        icon = R.drawable.pause_icon,
+                        size = 100.dp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                    ButtonLayout(
+                        image = R.drawable.red_button,
+                        icon = R.drawable.pause_icon,
+                        size = 100.dp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                    ButtonLayout(
+                        image = R.drawable.yellow_button,
+                        icon = R.drawable.pause_icon,
+                        size = 100.dp,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                    Spacer(modifier = Modifier.size(120.dp))
+                }
             }
         }
 
@@ -245,8 +283,8 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
 }
 
 //This Area is for Preview Only
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun Preview(){
-//    GameScreen(navController = NavController(LocalContext.current), gameViewModel = GameViewModel())
-//}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun Preview(){
+    GameScreen(navController = NavController(LocalContext.current), gameViewModel = GameViewModel())
+}

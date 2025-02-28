@@ -1,12 +1,11 @@
 package com.project.armbreaker.modules.game.ui
 
-import android.graphics.drawable.Icon
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -17,22 +16,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.project.armbreaker.R
 import kotlin.random.Random
 
 @Composable
@@ -201,3 +199,50 @@ public val Exit: ImageVector
     }
 
 private var _Exit: ImageVector? = null
+
+@Composable
+fun ButtonLayout(
+    @DrawableRes image: Int,
+    icon: Any? = null,
+    size: Dp,
+    modifier: Modifier
+) {
+    Box() {
+        Image(
+            painter = painterResource(image),
+            contentDescription = "",
+            contentScale = ContentScale.Fit,
+        )
+        Box(
+            modifier = Modifier.align(Alignment.Center)
+        ){
+            // Handle different icon types
+            icon?.let {
+                when (it) {
+                    is Int -> Icon(
+                        painter = painterResource(it),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(size)
+                            .offset(y = (-45).dp),
+                        tint = Color(0xFF1F1414)
+                    )
+                    is ImageVector -> Icon(
+                        imageVector = it,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(size)
+                            .offset(y = (-35).dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ObjectPreview(){
+    ButtonLayout(R.drawable.green_button, R.drawable.pause_icon, 250.dp, Modifier)
+}
+
