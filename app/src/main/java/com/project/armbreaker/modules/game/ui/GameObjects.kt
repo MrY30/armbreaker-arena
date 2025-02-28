@@ -5,12 +5,17 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +28,7 @@ import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.layout.ContentScale
@@ -201,48 +207,51 @@ public val Exit: ImageVector
 private var _Exit: ImageVector? = null
 
 @Composable
-fun ButtonLayout(
-    @DrawableRes image: Int,
-    icon: Any? = null,
-    size: Dp,
-    modifier: Modifier
+fun GameButton(
+    buttonImage: Painter = painterResource(R.drawable.green_button),
+    iconPainter: Painter? = null, // For drawable icons
+    iconVector: ImageVector? = null, // For Material Icons
+    size:Int = 80,
+    onClick: () -> Unit,
 ) {
-    Box() {
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        // Background image
         Image(
-            painter = painterResource(image),
-            contentDescription = "",
-            contentScale = ContentScale.Fit,
+            painter = buttonImage,
+            contentDescription = "Button Background",
+            modifier = Modifier.fillMaxSize()
         )
-        Box(
-            modifier = Modifier.align(Alignment.Center)
-        ){
-            // Handle different icon types
-            icon?.let {
-                when (it) {
-                    is Int -> Icon(
-                        painter = painterResource(it),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(size)
-                            .offset(y = (-45).dp),
-                        tint = Color(0xFF1F1414)
-                    )
-                    is ImageVector -> Icon(
-                        imageVector = it,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(size)
-                            .offset(y = (-35).dp)
-                    )
-                }
-            }
+
+        // Conditionally display an icon if either painter or vector is provided
+        when {
+            iconPainter != null -> Icon(
+                painter = iconPainter,
+                contentDescription = "Button Icon",
+                modifier = Modifier
+                    .size((size * 0.5).dp)
+                    .offset(y = (-10).dp)
+            )
+            iconVector != null -> Icon(
+                imageVector = iconVector,
+                contentDescription = "Button Icon",
+                modifier = Modifier
+                    .size((size * 0.5).dp)
+                    .offset(y = (-10).dp)
+            )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ObjectPreview(){
-    ButtonLayout(R.drawable.green_button, R.drawable.pause_icon, 250.dp, Modifier)
-}
+//@Preview(showBackground = false)
+//@Composable
+//fun ObjectPreview(){
+//    GameButton (iconVector = Exit){
+//
+//    }
+//}
 

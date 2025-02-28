@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
@@ -75,19 +77,19 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
     ){
         //Adding the Background Crowd GIF
         //Note: This is not working in the Preview. Comment this area if you want to see the preview
-//        AndroidView(
-//            modifier = Modifier.fillMaxSize(),
-//            factory = { context ->
-//                ImageView(context).apply {
-//                    scaleType = ImageView.ScaleType.CENTER_CROP
-//                    Glide.with(context)
-//                        .asGif()
-//                        .load(R.drawable.game_background)
-//                        .placeholder(R.drawable.game_background_placeholder)
-//                        .into(this)
-//                }
-//            }
-//        )
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                ImageView(context).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    Glide.with(context)
+                        .asGif()
+                        .load(R.drawable.game_background)
+                        .placeholder(R.drawable.game_background_placeholder)
+                        .into(this)
+                }
+            }
+        )
 
         //Adding the Enemy Layer Image
         Image(
@@ -109,35 +111,20 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             //Pause Button [Temporary Back and Restart Buttons]
             Row(
                 modifier = Modifier
+                    .fillMaxSize()
                     .weight(1f)
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(horizontal = 16.dp)
+                    .offset(y = 20.dp)
             ){
-                Button(onClick = {
-                    gameViewModel.restartGame()
-                }, modifier = Modifier
-                    .padding(2.dp),
-                    enabled = gameViewModel.allowRestart,
-                    shape = RectangleShape
-                ){
-                    Text(
-                        text = "Restart",
-                        fontSize = 20.sp,
-                    )
-                }
-                Button(onClick = {
-                    navController.navigate("home")
-                }, modifier = Modifier
-                    .padding(2.dp),
-                    shape = RectangleShape
-                ){
-                    Text(
-                        text = "Back",
-                        fontSize = 20.sp
-                    )
+                //This is the Pause Button
+                GameButton(
+                    buttonImage = painterResource(R.drawable.purple_button),
+                    iconPainter = painterResource(R.drawable.pause_icon),
+                    size = 50
+                ) {
+                    gameViewModel.pauseGame()
                 }
             }
-
             //Belt Level Image
             Box(
                 modifier = Modifier
@@ -235,7 +222,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     fontFamily = thaleahFat,
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 40.sp,
+                    fontSize = 50.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxSize()
@@ -246,35 +233,34 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 Row(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.Top
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-100).dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Spacer(modifier = Modifier.size(120.dp))
-                    ButtonLayout(
-                        image = R.drawable.green_button,
-                        icon = R.drawable.pause_icon,
-                        size = 100.dp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
-                    ButtonLayout(
-                        image = R.drawable.red_button,
-                        icon = R.drawable.pause_icon,
-                        size = 100.dp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
-                    ButtonLayout(
-                        image = R.drawable.yellow_button,
-                        icon = R.drawable.pause_icon,
-                        size = 100.dp,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
-                    Spacer(modifier = Modifier.size(120.dp))
+                    //This is the Exit Button
+                    GameButton(
+                        buttonImage = painterResource(R.drawable.red_button),
+                        iconVector = Exit,
+                        size = 60
+                    ){
+                        navController.popBackStack()
+                    }
+                    GameButton(
+                        buttonImage = painterResource(R.drawable.green_button),
+                        iconPainter = painterResource(R.drawable.play_icon),
+                        size = 60
+                    ){
+                        gameViewModel.continueGame()
+                    }
+                    GameButton(
+                        buttonImage = painterResource(R.drawable.yellow_button),
+                        iconVector = Restart,
+                        size = 60
+                    ){
+                        gameViewModel.restartGame()
+                    }
                 }
             }
         }
@@ -283,8 +269,8 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
 }
 
 //This Area is for Preview Only
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun Preview(){
-    GameScreen(navController = NavController(LocalContext.current), gameViewModel = GameViewModel())
-}
+//@Preview(showBackground = true, showSystemUi = true)
+//@Composable
+//fun Preview(){
+//    GameScreen(navController = NavController(LocalContext.current), gameViewModel = GameViewModel())
+//}
