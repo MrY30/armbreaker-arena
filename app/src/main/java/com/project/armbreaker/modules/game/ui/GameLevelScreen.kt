@@ -1,6 +1,5 @@
 package com.project.armbreaker.modules.game.ui
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -30,26 +29,30 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.modules.game.data.GameDataSource
 import com.project.armbreaker.modules.game.data.LevelsList
+import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
 fun GameLevelCard(
+    modifier: Modifier = Modifier,
     level: GameDataSource,
     navController: NavController,
     gameViewModel: GameViewModel,
-    modifier: Modifier = Modifier
+    isEnabled: Boolean = true,
 ) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth().clickable {
-            gameViewModel.gameLevel = level.level
-            gameViewModel.gameDelay = level.delay
-            gameViewModel.enemyStrength = level.enemy
-            gameViewModel.restartGame()
-            Log.w("LOG","${gameViewModel.gameLevel}")
-            navController.navigate("game")
-
-        },
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable {
+                if(isEnabled){
+                    gameViewModel.gameLevel = level.level
+                    gameViewModel.gameDelay = level.delay
+                    gameViewModel.enemyStrength = level.enemy
+                    gameViewModel.restartGame()
+                    navController.navigate("game")
+                }
+           },
         colors = CardDefaults.cardColors(
-            containerColor = Color.Yellow,
+            containerColor = if(isEnabled) Color(0xFFD0BCFF) else Color.Gray,
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
@@ -58,6 +61,7 @@ fun GameLevelCard(
         Column {
             Text(
                 text = "Level ${level.level}",
+                fontFamily = thaleahFat,
                 modifier = Modifier.padding(16.dp),
                 fontSize = 20.sp
             )
@@ -67,15 +71,17 @@ fun GameLevelCard(
 
 @Composable
 fun GameLevelList(
+    modifier: Modifier = Modifier,
     levelsList: List<GameDataSource>,
+    unlockedLevels: Int = 50,
     navController: NavController,
     gameViewModel: GameViewModel,
-    modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
         items(levelsList) { level ->
             GameLevelCard(
                 level = level,
+                isEnabled = level.level <= unlockedLevels,
                 navController = navController,
                 gameViewModel = gameViewModel,
                 modifier = Modifier.padding(8.dp)
@@ -100,6 +106,7 @@ fun GameLevelScreen(navController: NavController, gameViewModel: GameViewModel) 
     ) {
         GameLevelList(
             levelsList = LevelsList().loadLevels(),
+            unlockedLevels = 5, //This is static. This should be changed using Firebase collection value
             navController = navController,
             gameViewModel = gameViewModel
         )
