@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -21,17 +20,16 @@ import com.project.armbreaker.R
 
 @Composable
 fun AboutScreen(navController: NavController) {
-    // Create a scrollable column with some basic styling
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF121212)) // Dark background to fit game theme
+            .background(Color(0xFF121212)) // Dark theme background
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Header with a game logo (placeholder image)
+        // Game Logo
         Image(
-            painter = painterResource(id = R.drawable.enemy_layer), // Replace with your logo
+            painter = painterResource(id = R.drawable.enemy_layer),
             contentDescription = "Game Logo",
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
@@ -51,44 +49,90 @@ fun AboutScreen(navController: NavController) {
 
         // Game description
         Text(
-            text = "ArmBreaker is an immersive action-packed game where you take on the role of a hero with extraordinary arm-strength abilities. Your mission is to fight off evil forces that threaten the peaceful world of Arcadia. Traverse through various levels, upgrade your skills, and face ever-stronger enemies.",
+            text = "ArmBreaker is an immersive action-packed game where you take on the role of a warrior in the ultimate arm-wrestling arena. Battle against various opponents, level up your strength, and claim victory in every match.",
             style = TextStyle(color = Color.Gray, fontSize = 16.sp),
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Game Features Section
+        // **Game Developers Section**
         Text(
-            text = "Game Features:",
+            text = "Game Developers",
             style = TextStyle(
                 color = Color.White,
-                fontSize = 20.sp,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
+                    contentDescription = "Developer 1",
+                    modifier = Modifier.size(80.dp)
+                )
+                Text(text = "John Doe", color = Color.White, fontSize = 14.sp)
+                Text(
+                    text = "Lead Developer with expertise in game mechanics and UI design.",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
+                    contentDescription = "Developer 2",
+                    modifier = Modifier.size(80.dp)
+                )
+                Text(text = "Jane Smith", color = Color.White, fontSize = 14.sp)
+                Text(
+                    text = "Game Designer focusing on character animations and immersive gameplay.",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // **How to Play Section**
+        Text(
+            text = "How to Play",
+            style = TextStyle(
+                color = Color.White,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
         Text(
-            text = "• Explore vast worlds filled with exciting challenges.\n• Upgrade your character with unique abilities.\n• Defeat challenging bosses to progress through the story.\n• Collect rare items and unlock special rewards.\n• Stunning graphics and immersive sound effects.",
+            text = "Tap rapidly to overpower your opponent. The faster you tap, the stronger your grip becomes, allowing you to dominate your rival!",
             style = TextStyle(color = Color.Gray, fontSize = 16.sp),
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Placeholder content (Lorem Ipsum)
+        // **Storyline Section**
         Text(
-            text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin suscipit orci at ante volutpat, et maximus ipsum sodales. Cras posuere ultricies dui, in lobortis purus egestas at.",
-            style = TextStyle(color = Color.Gray, fontSize = 16.sp),
-            modifier = Modifier.padding(bottom = 16.dp)
+            text = "Storyline",
+            style = TextStyle(
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-
-        // Story section
         Text(
-            text = "The story of ArmBreaker takes place in a time of great conflict. The peaceful kingdom of Arcadia is under siege by dark forces led by the tyrant Lord Velkar. As the chosen hero, you must embark on a perilous journey to save your kingdom and restore peace.",
+            text = "The world of ArmBreaker is set in a legendary gaming arena where only the strongest arm wrestlers thrive. With each victory, you unlock new levels, face stronger opponents, and push your skills to the ultimate test.",
             style = TextStyle(color = Color.Gray, fontSize = 16.sp),
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // Footer with a simple button to go back (can be used for navigation)
+        // Back Button
         Button(
-            onClick = { /* Handle navigation */ },
+            onClick = { navController.navigate("home") },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(top = 16.dp),
