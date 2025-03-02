@@ -14,8 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.modules.auth.ui.LoginScreen
+import com.project.armbreaker.modules.game.ui.GameLevelScreen
 import com.project.armbreaker.modules.game.ui.GameScreen
 import com.project.armbreaker.modules.game.ui.GameViewModel
+import com.project.armbreaker.modules.game.ui.OldGameModel
 import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
@@ -47,6 +49,8 @@ class MainActivity : ComponentActivity() {
             val authEmail = authState.email
             val navController = rememberNavController()
 
+            val gameViewModel: GameViewModel = viewModel()
+
             NavHost(
                 navController = navController,
                 startDestination = if (authEmail.isNullOrEmpty()) "login" else "home"
@@ -72,8 +76,12 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("game") {
                     playGameMusic()
-                    val gameViewModel: GameViewModel = viewModel()
+                    //val gameViewModel: OldGameModel = viewModel()
                     GameScreen(navController = navController, gameViewModel = gameViewModel)
+                }
+                composable("level"){
+                    playGeneralMusic()
+                    GameLevelScreen(navController = navController, gameViewModel = gameViewModel)
                 }
             }
         }

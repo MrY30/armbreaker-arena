@@ -66,7 +66,7 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
                     authViewModel.logout()
                 }
                 ButtonLayout("PLAY"){
-                    navController.navigate("game")
+                    navController.navigate("level")
                 }
                 ButtonLayout("LOGIN"){
                     navController.navigate("login")

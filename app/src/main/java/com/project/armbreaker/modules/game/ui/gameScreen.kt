@@ -1,5 +1,6 @@
 package com.project.armbreaker.modules.game.ui
 
+import android.util.Log
 import android.widget.ImageView
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -53,7 +54,7 @@ import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
 fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
-
+    Log.w("LOG","${gameViewModel.gameLevel}")
     //ROTATION BOX
     val animateArm by animateFloatAsState(
         targetValue = gameViewModel.rotationAngle,
@@ -174,7 +175,7 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                         color = Color.White,
                     )
                     Text(
-                        text = "100",
+                        text = "${gameViewModel.gameLevel}",
                         fontFamily = pixelGame,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
@@ -239,27 +240,56 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    //This is the Exit Button
-                    GameButton(
-                        buttonImage = painterResource(R.drawable.red_button),
-                        iconVector = Exit,
-                        size = 60
-                    ){
-                        navController.popBackStack()
+                    if(gameViewModel.countdownText == "Pause"){
+                        //This is the Exit Button
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.red_button),
+                            iconVector = Exit,
+                            size = 60
+                        ){
+                            navController.popBackStack() //returns to game level screen
+                        }
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.green_button),
+                            iconPainter = painterResource(R.drawable.play_icon),
+                            size = 60
+                        ){
+                            gameViewModel.resumeGame()
+                        }
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.yellow_button),
+                            iconVector = Restart,
+                            size = 60
+                        ){
+                            gameViewModel.restartGame()
+                        }
                     }
-                    GameButton(
-                        buttonImage = painterResource(R.drawable.green_button),
-                        iconPainter = painterResource(R.drawable.play_icon),
-                        size = 60
-                    ){
-                        gameViewModel.continueGame()
+                    if(gameViewModel.countdownText == "You Lose"){
+                        //chooses either returning to game level screen or restart game
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.red_button),
+                            iconVector = Exit,
+                            size = 60
+                        ){
+                            navController.popBackStack()
+                        }
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.yellow_button),
+                            iconVector = Restart,
+                            size = 60
+                        ){
+                            gameViewModel.restartGame()
+                        }
                     }
-                    GameButton(
-                        buttonImage = painterResource(R.drawable.yellow_button),
-                        iconVector = Restart,
-                        size = 60
-                    ){
-                        gameViewModel.restartGame()
+                    if(gameViewModel.countdownText == "You Win!"){
+                        //chooses either going back to game level screen or exit
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.green_button),
+                            iconPainter = painterResource(R.drawable.play_icon),
+                            size = 60
+                        ){
+                            navController.popBackStack()
+                        }
                     }
                 }
             }

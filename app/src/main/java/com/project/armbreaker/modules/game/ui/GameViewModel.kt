@@ -1,6 +1,7 @@
 package com.project.armbreaker.modules.game.ui
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -12,9 +13,14 @@ import kotlinx.coroutines.launch
 class GameViewModel: ViewModel(){
     var gameStarted by mutableStateOf(false)
     var gamePaused by mutableStateOf(false)
+    var allowPause by mutableStateOf(true)
     var countdownText by mutableStateOf("Tap to Start")
-    var allowRestart by mutableStateOf(false)
     var rotationAngle by mutableStateOf(0f)
+
+    //game states for levels
+    var gameLevel by mutableStateOf(0)
+    var gameDelay by mutableLongStateOf(0)
+    var enemyStrength by mutableStateOf(1f)
 
     private var gameJob: Job? = null
 
@@ -23,7 +29,6 @@ class GameViewModel: ViewModel(){
             rotationAngle = 0f
             gameStarted = true
             gamePaused = false
-            allowRestart = false
             countdownText = "3"
 
             gameJob = viewModelScope.launch {
@@ -42,12 +47,11 @@ class GameViewModel: ViewModel(){
     private suspend fun runGameLoop(){
         while (countdownText == "TAP FAST!") {
             if (gamePaused) return
-            delay(100) //Increasing Level, Increasing Difficulty
-            rotationAngle += 1f //Increasing Level, Increasing Difficulty
+            delay(gameDelay) //Increasing Level, Increasing Difficulty
+            rotationAngle += enemyStrength //Increasing Level, Increasing Difficulty
             if (rotationAngle >= 35f) {
-                countdownText = "You Lose!"
-                allowRestart = true
-                gameStarted = false
+                countdownText = "You Lose"
+                allowPause = false
             }
         }
     }
@@ -57,21 +61,20 @@ class GameViewModel: ViewModel(){
             rotationAngle -= 1f
             if (rotationAngle <= -35f) {
                 countdownText = "You Win!"
-                allowRestart = true
-                gameStarted = false
+                allowPause = false
             }
         }
     }
 
     fun pauseGame(){
-        if(gameStarted && !gamePaused){
+        if(gameStarted && !gamePaused && allowPause){
             gamePaused = true
             gameJob?.cancel() //Stop the coroutine
-            countdownText = "Paused"
+            countdownText = "Pause"
         }
     }
 
-    fun continueGame(){
+    fun resumeGame(){
         if(gameStarted && gamePaused){
             gamePaused = false
             countdownText = "TAP FAST!"
@@ -85,7 +88,6 @@ class GameViewModel: ViewModel(){
         gameJob?.cancel()
         gameStarted = false
         gamePaused = false
-        allowRestart = false
         countdownText = "Tap to Start"
         rotationAngle = 0f
     }
