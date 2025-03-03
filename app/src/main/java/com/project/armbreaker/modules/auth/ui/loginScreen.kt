@@ -108,7 +108,7 @@ fun LoginScreen(
                     authViewModel.signInWithEmail(email,password)
                 } else {
                     // Handle signup
-                    if (username.isNotBlank() && password.isNotBlank() && email.isNotBlank() && phoneNumber.isNotBlank()) {
+                    if (username.isNotBlank() && password.isNotBlank() && email.isNotBlank()) {
                         // Here, we add username, password, email, and phone to the account map
                         accounts.value[username] = password // This is just a temporary storage for simplicity
                         // You can store other information as needed (e.g., email, phone)
