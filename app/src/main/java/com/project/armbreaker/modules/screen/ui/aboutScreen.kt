@@ -106,35 +106,48 @@ fun AboutScreen(navController: NavController) {
             )
         }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
-                contentDescription = "Developer 1",
-                modifier = Modifier.size(80.dp)
-            )
-            Text(text = "John Doe", color = Color.White, fontSize = 14.sp)
-            Text(
-                text = "Lead Developer with expertise in game mechanics and UI design.",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(4.dp)
-            )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly, // Ensures even spacing
+            verticalAlignment = Alignment.Top // Aligns elements to the top
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f) // Ensures equal width for both columns
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
+                    contentDescription = "Developer 1",
+                    modifier = Modifier.size(80.dp)
+                )
+                Text(text = "John Doe", color = Color.White, fontSize = 14.sp)
+                Text(
+                    text = "Lead Developer with expertise in game mechanics and UI design.",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.weight(1f) // Ensures equal width for both columns
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
+                    contentDescription = "Developer 2",
+                    modifier = Modifier.size(80.dp)
+                )
+                Text(text = "Jane Smith", color = Color.White, fontSize = 14.sp)
+                Text(
+                    text = "Game Designer focusing on character animations and immersive gameplay.",
+                    color = Color.Gray,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
         }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(
-                painter = painterResource(id = R.drawable.enemy_layer), // Replace with actual developer image
-                contentDescription = "Developer 2",
-                modifier = Modifier.size(80.dp)
-            )
-            Text(text = "Jane Smith", color = Color.White, fontSize = 14.sp)
-            Text(
-                text = "Game Designer focusing on character animations and immersive gameplay.",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
