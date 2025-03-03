@@ -49,13 +49,13 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Username input
         TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email Address") },
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
             modifier = Modifier.fillMaxWidth()
         )
+
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -72,21 +72,10 @@ fun LoginScreen(
 
         // Show additional fields (Email and Phone) only when signing up
         if (!isLogin) {
-            // Email input
             TextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Phone Number input
-            TextField(
-                value = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                label = { Text("Phone Number") },
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email Address") },
                 modifier = Modifier.fillMaxWidth()
             )
         }
