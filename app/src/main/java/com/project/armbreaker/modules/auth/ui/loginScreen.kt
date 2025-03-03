@@ -21,21 +21,10 @@ fun LoginScreen(
     authViewModel: AuthViewModel
 ) {
     var username by remember { mutableStateOf("") }
-    var isLogin by remember { mutableStateOf(true) }
-    var phoneNumber by remember { mutableStateOf("") }
-    var errorText by remember { mutableStateOf("") }
-
-    // Temporary hardcoded username and password
-    val validUsername = "user"
-    val validPassword = "user1"
-
-    // Stores the account data temporarily in memory
-    val accounts = remember { mutableStateOf(mutableMapOf<String, String>()) }
-
-    //Applying authentications From Firebase
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val appContext = LocalContext.current
+    var isLogin by remember { mutableStateOf(true) }
+    var errorText by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -44,22 +33,28 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Show Login or Sign Up Text
         Text(text = if (isLogin) "Login" else "Sign Up", style = MaterialTheme.typography.headlineMedium)
-
         Spacer(modifier = Modifier.height(16.dp))
 
+        if (!isLogin) {
+            TextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
         TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") },
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email Address") },
             modifier = Modifier.fillMaxWidth()
         )
 
-
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Password input
         TextField(
             value = password,
             onValueChange = { password = it },
@@ -68,53 +63,28 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Show additional fields (Email and Phone) only when signing up
-        if (!isLogin) {
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email Address") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show error text if login fails
         if (errorText.isNotEmpty()) {
-            Text(
-                text = errorText,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
-            )
-
+            Text(text = errorText, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        // Login or Signup Button
         Button(
             onClick = {
-                errorText = "" // Reset the error message before each attempt
+                errorText = "" // Reset error before validation
                 if (isLogin) {
-                    // Handle login with temporary credentials
-//                    if (username == validUsername && password == validPassword) {
-//                        navController.navigate("home") // Navigate to home screen
-//                    } else {
-//                        errorText = "Invalid username or password"
-//                    }
-                    //Trying Email authentication using Google Firebase
-                    authViewModel.signInWithEmail(email,password)
+                    authViewModel.signInWithEmail(email, password)
                 } else {
-                    // Handle signup
-                    if (username.isNotBlank() && password.isNotBlank() && email.isNotBlank()) {
-                        // Here, we add username, password, email, and phone to the account map
-                        accounts.value[username] = password // This is just a temporary storage for simplicity
-                        // You can store other information as needed (e.g., email, phone)
-
-                        isLogin = true // Switch to login after signup
-                        navController.navigate("home") // Navigate to home screen after signup
+                    if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
+                        authViewModel.registerUser(username, email, password) { success, message ->
+                            if (success) {
+                                isLogin = true
+                                navController.navigate("home")
+                            } else {
+                                errorText = message // Display specific error message
+                            }
+                        }
                     } else {
                         errorText = "Please fill out all fields"
                     }
@@ -122,17 +92,18 @@ fun LoginScreen(
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-           Text(text = if (isLogin) "Login" else "Sign Up")
+            Text(text = if (isLogin) "Login" else "Sign Up")
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Switch between login and signup
         TextButton(onClick = { isLogin = !isLogin }) {
             Text(text = if (isLogin) "Don't have an account? Sign Up" else "Already have an account? Login")
         }
     }
 }
+
 
 //@Preview(showBackground = true)
 //@Composable

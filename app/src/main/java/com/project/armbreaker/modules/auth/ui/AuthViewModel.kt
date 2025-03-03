@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.util.Patterns
 
 class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewModel() {
     // Expose screen UI state
@@ -41,16 +42,32 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
         }
     }
 
-    fun registerUser(email: String, password: String) {
-        Firebase.auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // sign out immediately after registering
-                    Firebase.auth.signOut()
+
+
+    fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+
+    fun registerUser(username: String, email: String, password: String, onResult: (Boolean, String) -> Unit) {
+        if (!isValidEmail(email)) {
+            onResult(false, "Invalid email format")
+            return
+        }
+        if (password.length < 6) { // Firebase requires at least 6 characters
+            onResult(false, "Password must be at least 6 characters")
+            return
+        }
+
+        viewModelScope.launch {
+            authRepository.registerUser(username, email, password) { success ->
+                if (success) {
+                    onResult(true, "Signup successful")
                 } else {
-                    Log.w("FIREBASE_REGISTER", "createUserWithEmail:failure")
+                    onResult(false, "Signup failed, try again")
                 }
             }
+        }
     }
 
     fun signInWithEmail(email: String, password: String) {

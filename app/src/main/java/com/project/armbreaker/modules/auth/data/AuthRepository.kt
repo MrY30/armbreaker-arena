@@ -7,13 +7,20 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import java.util.UUID
 
 class AuthRepository: AuthRepositoryInterface {
+
+    private val auth: FirebaseAuth = Firebase.auth
+    private val db = FirebaseFirestore.getInstance()
+
     override suspend fun signInWithGoogle(context: Context, onSignIn: (user: FirebaseUser?)->Unit) {
         // create google id option
         val googleIdOption = GetGoogleIdOption.Builder()
@@ -79,4 +86,30 @@ class AuthRepository: AuthRepositoryInterface {
     override fun getCurrentUser(): FirebaseUser? {
         return Firebase.auth.currentUser
     }
+
+
+
+    override suspend fun registerUser(username: String, email: String, password: String, onResult: (Boolean) -> Unit) {
+        try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val user = result.user
+            user?.let {
+                val userData = hashMapOf(
+                    "username" to username,
+                    "email" to email,
+                    "userId" to it.uid,
+                    "level" to 1 // Default level for new users
+                )
+                db.collection("Users").document(it.uid).set(userData).await()
+                onResult(true)
+            } ?: onResult(false)
+        } catch (e: Exception) {
+            Log.e("REGISTER_USER", "Error registering user: ${e.message}")
+            onResult(false)
+        }
+    }
+
+
+
+
 }
