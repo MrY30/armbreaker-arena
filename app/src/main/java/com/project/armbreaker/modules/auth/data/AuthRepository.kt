@@ -25,7 +25,7 @@ class AuthRepository: AuthRepositoryInterface {
         // create google id option
         val googleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false) // allow user to pick any account
-            .setServerClientId("164219022594-692ab6sitf86ah6i59ohc1t38artt4t8.apps.googleusercontent.com")
+            .setServerClientId("241785229958-1d2sjo0h991nfch713v6717s8clcd4u7.apps.googleusercontent.com")
             .setAutoSelectEnabled(false) // prevent the app from auto selecting the previous account
             .setNonce(UUID.randomUUID().toString())
             .build()
