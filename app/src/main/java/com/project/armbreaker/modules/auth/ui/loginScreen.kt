@@ -25,6 +25,8 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
     var errorText by remember { mutableStateOf("") }
+    val appContext = LocalContext.current
+
 
     Column(
         modifier = Modifier
@@ -93,6 +95,15 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = if (isLogin) "Login" else "Sign Up")
+        }
+
+        Button(
+            onClick = {
+                authViewModel.signInWithGoogle(appContext)
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(modifier = Modifier.padding(start = 8.dp), text = "Sign in with Google")
         }
 
 

@@ -1,10 +1,13 @@
 package com.project.armbreaker.modules.auth.data
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -21,63 +24,68 @@ class AuthRepository: AuthRepositoryInterface {
     private val auth: FirebaseAuth = Firebase.auth
     private val db = FirebaseFirestore.getInstance()
 
-    override suspend fun signInWithGoogle(context: Context, onSignIn: (user: FirebaseUser?)->Unit) {
-        // create google id option
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false) // allow user to pick any account
-            .setServerClientId("164219022594-692ab6sitf86ah6i59ohc1t38artt4t8.apps.googleusercontent.com")
-            .setAutoSelectEnabled(false) // prevent the app from auto selecting the previous account
-            .setNonce(UUID.randomUUID().toString())
-            .build()
+    override suspend fun signInWithGoogle(context: Context, onSignIn: (user: FirebaseUser?) -> Unit) {
+        try {
+            // Ensure we are using an Activity context
+            if (context !is Activity) {
+                Log.e("FIREBASE_LOGIN", "Invalid context: Must be an Activity context")
+                return
+            }
 
-        // create google sign-in request
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+            // 🔥 Sign out before attempting a new sign-in
+            Firebase.auth.signOut()
+            Log.d("GOOGLE_SIGN_IN", "User signed out before signing in again.")
 
-        // create google credential
-        val credentialManager = CredentialManager.create(context)
-        val credentialResponse = credentialManager.getCredential(
-            request = request,
-            context = context,
-        )
-        val credential = credentialResponse.credential
+            // 🔥 Clear any previous sign-in sessions
+            val signInClient = Identity.getSignInClient(context)
+            signInClient.signOut().addOnCompleteListener {
+                Log.d("GOOGLE_SIGN_IN", "Google Sign-In session cleared.")
+            }
 
-        if (credential is CustomCredential) {
-            // check the credential type
-            if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                // Use googleIdTokenCredential and extract id to validate and
-                // authenticate to firebase.
-                val googleIdTokenCredential =
-                    GoogleIdTokenCredential.createFrom(credential.data)
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId("164219022594-692ab6sitf86ah6i59ohc1t38artt4t8.apps.googleusercontent.com")
+                .setAutoSelectEnabled(false)
+                .setNonce(UUID.randomUUID().toString())
+                .build()
 
-                // create firebase credential
-                val firebaseCredential = GoogleAuthProvider.getCredential(
-                    googleIdTokenCredential.idToken, null
-                )
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-                val authResult = Firebase.auth.signInWithCredential(firebaseCredential)
-                authResult.addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val currentUser = task.result.user
+            val credentialManager = CredentialManager.create(context)
 
-                        if (currentUser != null) {
-                            // user successfully logged in
-                            onSignIn(currentUser)
-                        }
-                    } else {
-                        Log.e("FIREBASE_LOGIN", "The login task failed.")
-                    }
+            val credentialResponse = credentialManager.getCredential(
+                request = request,
+                context = context, // Ensure it's an Activity context
+            )
+            val credential = credentialResponse.credential
+
+            if (credential is CustomCredential) {
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+
+                    val authResult = Firebase.auth.signInWithCredential(firebaseCredential).await()
+
+                    Log.d("GOOGLE_SIGN_IN", "Sign-in successful: ${authResult.user?.email}")
+
+                    onSignIn(authResult.user)
+                } else {
+                    Log.e("GOOGLE_CREDENTIAL", "Unexpected type of credential")
                 }
             } else {
-                // Catch any unrecognized credential type here.
                 Log.e("GOOGLE_CREDENTIAL", "Unexpected type of credential")
             }
-        } else {
-            // Catch any unrecognized credential type here.
-            Log.e("GOOGLE_CREDENTIAL", "Unexpected type of credential")
+        } catch (e: ApiException) {
+            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.statusCode}")
+        } catch (e: Exception) {
+            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.message}")
         }
     }
+
+
+
 
     override fun logout() {
         Firebase.auth.signOut()
