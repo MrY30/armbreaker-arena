@@ -17,7 +17,6 @@ import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.game.ui.GameLevelScreen
 import com.project.armbreaker.modules.game.ui.GameScreen
 import com.project.armbreaker.modules.game.ui.GameViewModel
-import com.project.armbreaker.modules.game.ui.OldGameModel
 import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
