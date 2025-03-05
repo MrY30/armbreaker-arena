@@ -19,6 +19,7 @@ import com.project.armbreaker.modules.game.ui.GameScreen
 import com.project.armbreaker.modules.game.ui.GameViewModel
 import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
+import com.project.armbreaker.modules.screen.ui.IntroductionScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 
 class MainActivity : ComponentActivity() {
@@ -54,6 +55,13 @@ class MainActivity : ComponentActivity() {
                 navController = navController,
                 startDestination = if (authEmail.isNullOrEmpty()) "login" else "home"
             ) {
+                composable("intro"){
+                    playGeneralMusic()
+                    IntroductionScreen(
+                        navController = navController,
+                        authViewModel = authViewModel
+                    )
+                }
                 composable("login") {
                     playGeneralMusic()
                     LoginScreen(
@@ -130,5 +138,8 @@ class MainActivity : ComponentActivity() {
         generalMediaPlayer = null
         gameMediaPlayer = null
     }
-
+    /*
+    Overall Map System for Screens
+    IntroductionScreen -> LogInScreen -> HomeScreen -> GameLevelScreen -> GameScreen
+     */
 }
