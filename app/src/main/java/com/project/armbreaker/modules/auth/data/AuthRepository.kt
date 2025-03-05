@@ -118,6 +118,43 @@ class AuthRepository: AuthRepositoryInterface {
     }
 
 
+    override suspend fun signInWithUsername(username: String, password: String): Boolean {
+        try {
+            // Fetch the email associated with the username from Firestore
+            val userDocument = db.collection("Users")
+                .whereEqualTo("username", username)
+                .get()
+                .await()
+                .documents
+                .firstOrNull()
+
+            // If no user is found for the given username
+            if (userDocument == null) {
+                Log.e("SIGN_IN", "User with username $username not found")
+                return false
+            }
+
+            // Retrieve the email from the found document
+            val email = userDocument.getString("email")
+
+            if (email != null) {
+                // Proceed to sign in with the retrieved email and provided password
+                val authResult = auth.signInWithEmailAndPassword(email, password).await()
+                val user = authResult.user
+
+                // Check if the login was successful
+                if (user != null) {
+                    return true // Login success
+                } else {
+                    Log.e("SIGN_IN", "Login failed for email $email")
+                    return false // Login failed
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("SIGN_IN", "Sign-in failed: ${e.message}")
+        }
+        return false // Return false if something goes wrong
+    }
 
 
 }

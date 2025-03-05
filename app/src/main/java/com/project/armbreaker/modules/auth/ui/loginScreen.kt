@@ -49,8 +49,8 @@ fun LoginScreen(
         }
 
         TextField(
-            value = email,
-            onValueChange = { email = it },
+            value = username,
+            onValueChange = { username = it },
             label = { Text("Email Address") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -76,7 +76,11 @@ fun LoginScreen(
             onClick = {
                 errorText = "" // Reset error before validation
                 if (isLogin) {
-                    authViewModel.signInWithEmail(email, password)
+                    if (username.isNotBlank()) {
+                        authViewModel.signInWithUsername(username, password) // Use username for login
+                    } else {
+                        errorText = "Please enter your username"
+                    }
                 } else {
                     if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                         authViewModel.registerUser(username, email, password) { success, message ->
@@ -96,6 +100,7 @@ fun LoginScreen(
         ) {
             Text(text = if (isLogin) "Login" else "Sign Up")
         }
+
 
         Button(
             onClick = {

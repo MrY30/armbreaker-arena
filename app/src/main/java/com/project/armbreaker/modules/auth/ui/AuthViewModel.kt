@@ -70,24 +70,22 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
         }
     }
 
-    fun signInWithEmail(email: String, password: String) {
-        Firebase.auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.w("FIREBASE_REGISTER", "SUCCESS")
-                    val currentUser = task.result.user
-
-                    _uiState.update { currentState
-                        ->
-                        currentState.copy(
-                            email = currentUser?.email,
-                        )
-                    }
-                } else {
-                    Log.w("FIREBASE_REGISTER", "signInWithEmailAndPassword:failure")
+    fun signInWithUsername(username: String, password: String) {
+        viewModelScope.launch {
+            val isAuthenticated = authRepository.signInWithUsername(username, password) // Now using username instead of email
+            if (isAuthenticated) {
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        email = username // You could store the email if needed
+                    )
                 }
+                Log.d("FIREBASE_LOGIN", "Login successful")
+            } else {
+                Log.d("FIREBASE_LOGIN", "Login failed")
             }
+        }
     }
+
 
     fun signInWithGoogle(appContext: Context) {
         viewModelScope.launch {
@@ -101,4 +99,7 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
             }
         }
     }
+
+
+
 }
