@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
 
             NavHost(
                 navController = navController,
-                startDestination = if (authEmail.isNullOrEmpty()) "login" else "home"
+                startDestination = "intro"
             ) {
                 composable("intro"){
                     playGeneralMusic()
