@@ -125,7 +125,7 @@ class GameViewModel: ViewModel(){
             .get()
             .addOnSuccessListener { snapshot ->
                 if (!snapshot.isEmpty) {
-                    val level = snapshot.documents.first().getLong("level")?.toInt() ?: 1
+                    val level = snapshot.documents.first().getLong("level")?.toInt() ?: 0
                     playerLevel = level // Store the fetched level
                     onRead(level)
                     Log.d("FirebaseData", "Level: $level")

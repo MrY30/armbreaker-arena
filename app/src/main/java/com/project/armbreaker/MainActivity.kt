@@ -72,7 +72,8 @@ class MainActivity : ComponentActivity() {
                     playGeneralMusic()
                     OptionsScreen(
                         navController = navController,
-                        generalMediaPlayer
+                        generalMediaPlayer,
+                        authViewModel = authViewModel
                     )
                 }
                 composable("about"){

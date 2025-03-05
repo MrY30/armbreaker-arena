@@ -76,7 +76,8 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
             Column(
                 modifier = Modifier
                     .weight(3f)
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(horizontal = 32.dp, vertical = 64.dp),
                 verticalArrangement = Arrangement.Center,
             ){
                 //First State: Single Player, Multiplayer, Settings
@@ -125,13 +126,12 @@ fun showExitDialog(activity: Activity?) {
 }
 
 @Composable
-fun ButtonLayout(text:String, onClick: () -> Unit = {}){
+fun ButtonLayout(text:String, fontSize: Int = 30, modifier: Modifier = Modifier, onClick: () -> Unit = {}){
     Button(onClick = { //LOG OUT BUTTON
         //authViewModel.logout()
         onClick()
-    }, modifier = Modifier
+    }, modifier = modifier
         .fillMaxWidth()
-        .padding(horizontal = 60.dp, vertical = 10.dp)
         .background(
             brush = Brush.radialGradient(
                 colors = listOf(
@@ -154,14 +154,14 @@ fun ButtonLayout(text:String, onClick: () -> Unit = {}){
         Text(
             text = text,
             fontFamily = thaleahFat,
-            fontSize = 30.sp,
+            fontSize = (fontSize).sp,
             color = Color(0xFF13242F)
         )
     }
 }
 
 @Composable
-fun TitleLayout(text:String, fontFamily: FontFamily){
+fun TitleLayout(text:String, fontFamily: FontFamily, frontColor: Color = Color(0xFF13242F)){
     Box(
         modifier = Modifier.fillMaxWidth(), // Allows centering
         contentAlignment = Alignment.Center
@@ -189,7 +189,7 @@ fun TitleLayout(text:String, fontFamily: FontFamily){
             fontWeight = FontWeight.Normal,
             fontSize = 70.sp,
             textAlign = TextAlign.Center,
-            color = Color(0xFF13242F),
+            color = frontColor,
         )
     }
 }
