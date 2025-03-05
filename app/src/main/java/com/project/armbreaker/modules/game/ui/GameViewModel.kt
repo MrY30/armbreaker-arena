@@ -38,6 +38,7 @@ class GameViewModel: ViewModel(){
     fun startGame() {
         if (!gameStarted) {
             rotationAngle = 0f
+            allowPause = true
             gameStarted = true
             gamePaused = false
             countdownText = "3"

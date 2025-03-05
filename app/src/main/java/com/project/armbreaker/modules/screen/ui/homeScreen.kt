@@ -78,7 +78,8 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
                     .weight(3f)
                     .fillMaxSize()
                     .padding(horizontal = 32.dp, vertical = 64.dp),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ){
                 //First State: Single Player, Multiplayer, Settings
                 //If Single Player, proceed to Levels Screen
