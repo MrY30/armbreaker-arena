@@ -24,6 +24,10 @@ class GameViewModel: ViewModel(){
     var countdownText by mutableStateOf("Tap to Start")
     var rotationAngle by mutableStateOf(0f)
 
+    //store current user and highest level
+    private var userEmail by mutableStateOf("")
+    private var playerLevel by mutableStateOf(0) // Store player's level to avoid redundant Firebase calls
+
     //game states for levels
     var gameLevel by mutableStateOf(0)
     var gameDelay by mutableLongStateOf(0)
@@ -69,7 +73,11 @@ class GameViewModel: ViewModel(){
             if (rotationAngle <= -35f) {
                 countdownText = "You Win!"
                 allowPause = false
-                increaseLevel()
+
+                // Only increase level if the player is playing at their highest level
+                if(gameLevel == playerLevel){
+                    increaseLevel(userEmail)
+                }
             }
         }
     }
@@ -102,15 +110,23 @@ class GameViewModel: ViewModel(){
 
     //This function reloads the Game Level Screen depending on the level of the player / user
     fun getPlayerLevel(player: String, onRead: (level: Int) -> Unit) {
+        userEmail = player
+
+        //If Level is already stored, it will not fetch again in Firebase
+        if(playerLevel != 0){
+            onRead(playerLevel)
+            return
+        }
+
         val db = Firebase.firestore
 
-        val docRef = db.collection("Users")
+        db.collection("Users")
             .whereEqualTo("email", player)
-
-        docRef.get()
+            .get()
             .addOnSuccessListener { snapshot ->
                 if (!snapshot.isEmpty) {
                     val level = snapshot.documents.first().getLong("level")?.toInt() ?: 1
+                    playerLevel = level // Store the fetched level
                     onRead(level)
                     Log.d("FirebaseData", "Level: $level")
                 } else {
@@ -124,29 +140,36 @@ class GameViewModel: ViewModel(){
             }
     }
 
-
     //This function levels up the player or user upon winning
-    private fun increaseLevel() {
-//        val currentUser = auth.currentUser
-//        if (currentUser != null) {
-//            val userId = currentUser.uid
-//            val userRef = db.collection("Users").document(userId)
-//            db.runTransaction { transaction ->
-//                val snapshot = transaction.get(userRef)
-//                val currentLevel = snapshot.getLong("level")?.toInt() ?: 1
-//                val newLevel = currentLevel + 1
-//
-//                transaction.update(userRef, "level", newLevel)
-//                newLevel // Return the updated level
-//            }.addOnSuccessListener { updatedLevel ->
-//                _playerLevel.value = updatedLevel
-//                Log.d("FirebaseData", "User Level Updated: $updatedLevel")
-//            }.addOnFailureListener { e ->
-//                Log.e("FirebaseData", "Error updating level: ${e}")
-//            }
-//        } else {
-//            Log.e("FirebaseData", "No authenticated user found")
-//        }
+    private fun increaseLevel(player: String) {
+        val db = Firebase.firestore
+
+        val userRef = db.collection("Users")
+            .whereEqualTo("email", player)
+
+        userRef.get().addOnSuccessListener { documents ->
+            if (!documents.isEmpty) {
+                val document = documents.documents[0] // Get the first matched document
+                val currentLevel = document.getLong("level")?.toInt() ?: 0
+
+                if(currentLevel == playerLevel){
+                    val newLevel = currentLevel + 1
+                    document.reference.update("level", newLevel)
+                        .addOnSuccessListener {
+                            playerLevel = newLevel // Update stored value
+                            Log.d("FirebaseUpdate", "Level updated successfully to $newLevel")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("FirebaseUpdate", "Error updating level", e)
+                        }
+                }
+
+            } else {
+                Log.e("FirebaseUpdate", "User document not found")
+            }
+        }.addOnFailureListener { e ->
+            Log.e("FirebaseUpdate", "Error fetching user document", e)
+        }
     }
 
 }
