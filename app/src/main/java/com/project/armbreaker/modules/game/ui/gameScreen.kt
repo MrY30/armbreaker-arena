@@ -96,7 +96,6 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
         Image(
             modifier = Modifier
                 .fillMaxSize()
-                .border(1.dp, Color.Black)
                 .wrapContentHeight(Alignment.Bottom),
             painter = painterResource(id = R.drawable.enemy_layer),
             contentDescription = "Enemy Layer",

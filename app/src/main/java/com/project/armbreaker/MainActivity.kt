@@ -63,24 +63,39 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("home") {
                     playGeneralMusic()
-                    HomeScreen(navController = navController, authViewModel = authViewModel)
+                    HomeScreen(
+                        navController = navController,
+                        authViewModel = authViewModel
+                    )
                 }
                 composable("options"){
                     playGeneralMusic()
-                    OptionsScreen(navController = navController, generalMediaPlayer)
+                    OptionsScreen(
+                        navController = navController,
+                        generalMediaPlayer
+                    )
                 }
                 composable("about"){
                     playGeneralMusic()
-                    AboutScreen(navController = navController)
+                    AboutScreen(
+                        navController = navController
+                    )
                 }
                 composable("game") {
                     playGameMusic()
                     //val gameViewModel: OldGameModel = viewModel()
-                    GameScreen(navController = navController, gameViewModel = gameViewModel)
+                    GameScreen(
+                        navController = navController,
+                        gameViewModel = gameViewModel
+                    )
                 }
                 composable("level"){
                     playGeneralMusic()
-                    GameLevelScreen(navController = navController, gameViewModel = gameViewModel)
+                    GameLevelScreen(
+                        navController = navController,
+                        gameViewModel = gameViewModel,
+                        authViewModel = authViewModel
+                    )
                 }
             }
         }
