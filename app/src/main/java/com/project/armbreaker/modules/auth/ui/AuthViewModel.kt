@@ -99,16 +99,25 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
     fun signInWithGoogle(appContext: Context) {
         viewModelScope.launch {
             authRepository.signInWithGoogle(appContext) { currentUser ->
-                _uiState.update { currentState
-                    ->
-                    currentState.copy(
-                        email = currentUser?.email,
-                    )
+                if (currentUser != null) {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            email = currentUser.email,
+                            showGoogleSignInDialog = true,
+                            googleUsername = currentUser.displayName
+                                ?: currentUser.email?.substringBefore("@")
+                        )
+                    }
                 }
             }
         }
     }
-
+    fun clearGoogleSignInDialog() {
+        _uiState.update { it.copy(
+            showGoogleSignInDialog = false,
+            googleUsername = null
+        ) }
+    }
 
     fun clearError() {
         _uiState.update { it.copy(errorText = null) }

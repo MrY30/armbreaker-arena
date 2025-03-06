@@ -32,11 +32,10 @@ class AuthRepository: AuthRepositoryInterface {
                 return
             }
 
-            // 🔥 Sign out before attempting a new sign-in
+            // Clear previous sessions
             Firebase.auth.signOut()
             Log.d("GOOGLE_SIGN_IN", "User signed out before signing in again.")
 
-            // 🔥 Clear any previous sign-in sessions
             val signInClient = Identity.getSignInClient(context)
             signInClient.signOut().addOnCompleteListener {
                 Log.d("GOOGLE_SIGN_IN", "Google Sign-In session cleared.")
@@ -57,7 +56,7 @@ class AuthRepository: AuthRepositoryInterface {
 
             val credentialResponse = credentialManager.getCredential(
                 request = request,
-                context = context, // Ensure it's an Activity context
+                context = context,
             )
             val credential = credentialResponse.credential
 
@@ -67,23 +66,51 @@ class AuthRepository: AuthRepositoryInterface {
                     val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
 
                     val authResult = Firebase.auth.signInWithCredential(firebaseCredential).await()
+                    val user = authResult.user
 
-                    Log.d("GOOGLE_SIGN_IN", "Sign-in successful: ${authResult.user?.email}")
+                    if (user != null) {
+                        // Check if user document exists in Firestore
+                        val userDocRef = db.collection("Users").document(user.uid)
+                        val userDoc = userDocRef.get().await()
 
-                    onSignIn(authResult.user)
+                        if (!userDoc.exists()) {
+                            // Create new user document with Google info
+                            val username = user.displayName
+                                ?: user.email?.substringBefore("@")
+                                ?: "user_${user.uid.take(6)}"
+
+                            val userData = hashMapOf(
+                                "username" to username,
+                                "email" to user.email,
+                                "userId" to user.uid,
+                                "level" to 1
+                            )
+
+                            userDocRef.set(userData).await()
+                            Log.d("GOOGLE_SIGN_IN", "New user document created for ${user.email}")
+                        }
+
+                        Log.d("GOOGLE_SIGN_IN", "Sign-in successful: ${user.email}")
+                        onSignIn(user)
+                    } else {
+                        onSignIn(null)
+                    }
                 } else {
                     Log.e("GOOGLE_CREDENTIAL", "Unexpected type of credential")
+                    onSignIn(null)
                 }
             } else {
                 Log.e("GOOGLE_CREDENTIAL", "Unexpected type of credential")
+                onSignIn(null)
             }
         } catch (e: ApiException) {
-            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.statusCode}")
+            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.statusCode}", e)
+            onSignIn(null)
         } catch (e: Exception) {
-            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.message}")
+            Log.e("FIREBASE_LOGIN", "Google Sign-In failed: ${e.message}", e)
+            onSignIn(null)
         }
     }
-
 
 
 

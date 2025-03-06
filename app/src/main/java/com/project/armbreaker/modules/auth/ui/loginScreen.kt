@@ -26,16 +26,52 @@ fun LoginScreen(
     var isLogin by remember { mutableStateOf(true) }
     val appContext = LocalContext.current
     val authState by authViewModel.uiState.collectAsState()
+    var showGoogleDialog by remember { mutableStateOf(false) }
 
 
-    LaunchedEffect(authState.email) {
+    LaunchedEffect(authState) {
         if (authState.email != null) {
-            navController.navigate("home") {
-                popUpTo("login") { inclusive = true }
+            if (authState.showGoogleSignInDialog) {
+                showGoogleDialog = true
+            } else {
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
             }
         }
     }
 
+    if (showGoogleDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showGoogleDialog = false
+                authViewModel.clearGoogleSignInDialog()
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true }
+                }
+            },
+            title = { Text("Google Sign-In Successful") },
+            text = {
+                Column {
+                    Text("Username: ${authState.googleUsername ?: "N/A"}")
+                    Text("Password: Managed by Google account")
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showGoogleDialog = false
+                        authViewModel.clearGoogleSignInDialog()
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
