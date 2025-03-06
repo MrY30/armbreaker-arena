@@ -97,8 +97,20 @@ class AuthRepository: AuthRepositoryInterface {
 
 
 
-    override suspend fun registerUser(username: String, email: String, password: String, onResult: (Boolean) -> Unit) {
+    override suspend fun registerUser(username: String, email: String, password: String, onResult: (String?) -> Unit) {
         try {
+            // Check if username exists
+            val usernameQuery = db.collection("Users")
+                .whereEqualTo("username", username)
+                .get()
+                .await()
+
+            if (!usernameQuery.isEmpty) {
+                onResult("Username already exists")
+                return
+            }
+
+            // Create user
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val user = result.user
             user?.let {
@@ -106,21 +118,22 @@ class AuthRepository: AuthRepositoryInterface {
                     "username" to username,
                     "email" to email,
                     "userId" to it.uid,
-                    "level" to 1 // Default level for new users
+                    "level" to 1
                 )
                 db.collection("Users").document(it.uid).set(userData).await()
-                onResult(true)
-            } ?: onResult(false)
+                onResult(null)
+            } ?: onResult("Signup failed, try again")
+        } catch (e: com.google.firebase.auth.FirebaseAuthUserCollisionException) {
+            onResult("Email already in use")
         } catch (e: Exception) {
-            Log.e("REGISTER_USER", "Error registering user: ${e.message}")
-            onResult(false)
+            Log.e("REGISTER_USER", "Error: ${e.message}")
+            onResult("Signup failed, try again")
         }
     }
 
 
-    override suspend fun signInWithUsername(username: String, password: String): Boolean {
-        try {
-            // Fetch the email associated with the username from Firestore
+    override suspend fun signInWithUsername(username: String, password: String): String? {
+        return try {
             val userDocument = db.collection("Users")
                 .whereEqualTo("username", username)
                 .get()
@@ -128,33 +141,25 @@ class AuthRepository: AuthRepositoryInterface {
                 .documents
                 .firstOrNull()
 
-            // If no user is found for the given username
             if (userDocument == null) {
-                Log.e("SIGN_IN", "User with username $username not found")
-                return false
-            }
+                "Username does not exist"
+            } else {
+                val email = userDocument.getString("email")
+                    ?: return "Login error"
 
-            // Retrieve the email from the found document
-            val email = userDocument.getString("email")
-
-            if (email != null) {
-                // Proceed to sign in with the retrieved email and provided password
-                val authResult = auth.signInWithEmailAndPassword(email, password).await()
-                val user = authResult.user
-
-                // Check if the login was successful
-                if (user != null) {
-                    return true // Login success
-                } else {
-                    Log.e("SIGN_IN", "Login failed for email $email")
-                    return false // Login failed
+                try {
+                    val authResult = auth.signInWithEmailAndPassword(email, password).await()
+                    if (authResult.user != null) null
+                    else "Username and password do not match"
+                } catch (e: com.google.firebase.auth.FirebaseAuthInvalidCredentialsException) {
+                    "Username and password do not match"
+                } catch (e: Exception) {
+                    "Login failed: ${e.message}"
                 }
             }
         } catch (e: Exception) {
-            Log.e("SIGN_IN", "Sign-in failed: ${e.message}")
+            "An error occurred. Please try again."
         }
-        return false // Return false if something goes wrong
     }
-
 
 }

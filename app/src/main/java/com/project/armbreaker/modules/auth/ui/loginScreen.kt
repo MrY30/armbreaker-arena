@@ -24,8 +24,17 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLogin by remember { mutableStateOf(true) }
-    var errorText by remember { mutableStateOf("") }
     val appContext = LocalContext.current
+    val authState by authViewModel.uiState.collectAsState()
+
+
+    LaunchedEffect(authState.email) {
+        if (authState.email != null) {
+            navController.navigate("home") {
+                popUpTo("login") { inclusive = true }
+            }
+        }
+    }
 
 
     Column(
@@ -49,9 +58,9 @@ fun LoginScreen(
         }
 
         TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Email Address") },
+            value = if (isLogin) username else email,
+            onValueChange = { if (isLogin) username = it else email = it },
+            label = { Text(if (isLogin) "Username" else "Email Address") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -67,32 +76,34 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (errorText.isNotEmpty()) {
-            Text(text = errorText, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        authState.errorText?.let { error ->
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
 
         Button(
             onClick = {
-                errorText = "" // Reset error before validation
+                authViewModel.clearError()
                 if (isLogin) {
-                    if (username.isNotBlank()) {
-                        authViewModel.signInWithUsername(username, password) // Use username for login
+                    if (username.isBlank() || password.isBlank()) {
+                        authViewModel.setError("Please fill in all fields")
                     } else {
-                        errorText = "Please enter your username"
+                        authViewModel.signInWithUsername(username, password)
                     }
                 } else {
                     if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
-                        authViewModel.registerUser(username, email, password) { success, message ->
+                        authViewModel.registerUser(username, email, password) { success ->
                             if (success) {
                                 isLogin = true
                                 navController.navigate("home")
-                            } else {
-                                errorText = message // Display specific error message
                             }
                         }
                     } else {
-                        errorText = "Please fill out all fields"
+                        authViewModel.setError("Please fill out all fields")
                     }
                 }
             },
@@ -101,16 +112,12 @@ fun LoginScreen(
             Text(text = if (isLogin) "Login" else "Sign Up")
         }
 
-
         Button(
-            onClick = {
-                authViewModel.signInWithGoogle(appContext)
-            },
+            onClick = { authViewModel.signInWithGoogle(appContext) },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(modifier = Modifier.padding(start = 8.dp), text = "Sign in with Google")
+            Text(text = "Sign in with Google")
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
 

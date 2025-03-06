@@ -49,22 +49,28 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
     }
 
 
-    fun registerUser(username: String, email: String, password: String, onResult: (Boolean, String) -> Unit) {
+    fun registerUser(username: String, email: String, password: String, onResult: (Boolean) -> Unit) {
         if (!isValidEmail(email)) {
-            onResult(false, "Invalid email format")
+            _uiState.update { it.copy(errorText = "Invalid email format") }
+            onResult(false)
             return
         }
-        if (password.length < 6) { // Firebase requires at least 6 characters
-            onResult(false, "Password must be at least 6 characters")
+        if (password.length < 6) {
+            _uiState.update { it.copy(errorText = "Password must be at least 6 characters") }
+            onResult(false)
             return
         }
 
         viewModelScope.launch {
-            authRepository.registerUser(username, email, password) { success ->
-                if (success) {
-                    onResult(true, "Signup successful")
+            authRepository.registerUser(username, email, password) { errorMessage ->
+                if (errorMessage == null) {
+                    // Success case
+                    _uiState.update { it.copy(errorText = null) }
+                    onResult(true)
                 } else {
-                    onResult(false, "Signup failed, try again")
+                    // Error case
+                    _uiState.update { it.copy(errorText = errorMessage) }
+                    onResult(false)
                 }
             }
         }
@@ -72,16 +78,19 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
 
     fun signInWithUsername(username: String, password: String) {
         viewModelScope.launch {
-            val isAuthenticated = authRepository.signInWithUsername(username, password) // Now using username instead of email
-            if (isAuthenticated) {
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        email = username // You could store the email if needed
+            _uiState.update { it.copy(errorText = null) }
+            val errorMessage = authRepository.signInWithUsername(username, password)
+            if (errorMessage == null) {
+                // Get fresh user data after successful login
+                val user = authRepository.getCurrentUser()
+                _uiState.update {
+                    it.copy(
+                        email = user?.email ?: username,
+                        errorText = null
                     )
                 }
-                Log.d("FIREBASE_LOGIN", "Login successful")
             } else {
-                Log.d("FIREBASE_LOGIN", "Login failed")
+                _uiState.update { it.copy(errorText = errorMessage) }
             }
         }
     }
@@ -101,5 +110,12 @@ class AuthViewModel(private val authRepository: AuthRepositoryInterface) : ViewM
     }
 
 
+    fun clearError() {
+        _uiState.update { it.copy(errorText = null) }
+    }
+
+    fun setError(message: String) {
+        _uiState.update { it.copy(errorText = message) }
+    }
 
 }

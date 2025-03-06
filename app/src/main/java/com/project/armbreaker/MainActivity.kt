@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,7 +46,13 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             //Applying AuthViewModel
-            val authViewModel = AuthViewModel(authRepository = AuthRepository())
+            val authViewModel: AuthViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return AuthViewModel(AuthRepository()) as T
+                    }
+                }
+            )
             val authState by authViewModel.uiState.collectAsState()
             val authEmail = authState.email
             val navController = rememberNavController()
