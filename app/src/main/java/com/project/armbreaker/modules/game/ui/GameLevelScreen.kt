@@ -1,12 +1,12 @@
 package com.project.armbreaker.modules.game.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -14,13 +14,14 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -39,16 +40,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.project.armbreaker.R
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.modules.game.data.GameDataSource
 import com.project.armbreaker.modules.game.data.LevelsList
+import com.project.armbreaker.modules.screen.ui.TitleLayout
+import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
@@ -76,7 +77,6 @@ fun GameLevelScreen(
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
                 .padding(
                     start = WindowInsets.safeDrawing.asPaddingValues()
                         .calculateStartPadding(layoutDirection),
@@ -84,12 +84,34 @@ fun GameLevelScreen(
                         .calculateEndPadding(layoutDirection),
                 ),
         ) {
-            GameLevelList(
-                levelsList = LevelsList().loadLevels(),
-                unlockedLevels = updatedLevel!!, // Now safe to use
-                navController = navController,
-                gameViewModel = gameViewModel
-            )
+            Box {
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.FillBounds,
+                    painter = painterResource(id = R.drawable.screen_background),
+                    contentDescription = "Main Background",
+                )
+                Column (
+                    modifier = Modifier.fillMaxSize().statusBarsPadding(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ){
+                    Spacer(modifier = Modifier.height(30.dp))
+                    TitleLayout(
+                        text = "Choose A Level",
+                        fontFamily = pixelGame,
+                        fontSize = 60
+                    )
+                    Spacer(modifier = Modifier.height(15.dp))
+                    GameLevelList(
+                        modifier = Modifier.navigationBarsPadding(),
+                        levelsList = LevelsList().loadLevels(),
+                        unlockedLevels = updatedLevel!!, // Now safe to use
+                        navController = navController,
+                        gameViewModel = gameViewModel
+                    )
+                }
+            }
         }
     }
 }
@@ -116,18 +138,29 @@ fun GameLevelCard(
                 }
             },
         colors = CardDefaults.cardColors(
-            containerColor = if(isEnabled) Color(0xFFD0BCFF) else Color.Gray,
+            containerColor = if(isEnabled) Color(0xFFdaa520) else Color(0xff2c3e50),
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         ),
     ) {
-        Column {
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
             Text(
-                text = "Level ${level.level}",
+                text = "LEVEL",
+                fontSize = 24.sp,
                 fontFamily = thaleahFat,
-                modifier = Modifier.padding(16.dp),
-                fontSize = 20.sp
+                textAlign = TextAlign.Center,
+                color = if(isEnabled) Color(0xff2c3e50) else Color(0xFFdaa520)
+            )
+            Text(
+                text = "${level.level}",
+                fontSize = 48.sp,
+                fontFamily = thaleahFat,
+                textAlign = TextAlign.Center,
+                color = if(isEnabled) Color(0xff2c3e50) else Color(0xFFdaa520)
             )
         }
     }
@@ -141,7 +174,10 @@ fun GameLevelList(
     navController: NavController,
     gameViewModel: GameViewModel,
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(3),
+        modifier = modifier
+    ) {
         items(levelsList) { level ->
             GameLevelCard(
                 level = level,
@@ -195,6 +231,11 @@ fun LoadingScreen() {
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable fun GameLevelScreenPreview() {
 //    val navController = rememberNavController()
-//    val gameViewModel: GameViewModel = viewModel()
-//    GameLevelScreen(navController = navController, gameViewModel = gameViewModel)
+//    val gameViewModel: GameViewModel = mockk(relaxed = true)
+//    val authViewModel: AuthViewModel = viewModel()
+//    GameLevelScreen(
+//        navController = navController,
+//        gameViewModel = gameViewModel,
+//        authViewModel = authViewModel
+//    )
 //}

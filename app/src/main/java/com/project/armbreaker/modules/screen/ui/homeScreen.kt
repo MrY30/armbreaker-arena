@@ -162,7 +162,12 @@ fun ButtonLayout(text:String, fontSize: Int = 30, modifier: Modifier = Modifier,
 }
 
 @Composable
-fun TitleLayout(text:String, fontFamily: FontFamily, frontColor: Color = Color(0xFF13242F)){
+fun TitleLayout(
+    text:String,
+    fontFamily: FontFamily,
+    frontColor: Color = Color(0xFF13242F),
+    fontSize: Int = 70
+    ){
     Box(
         modifier = Modifier.fillMaxWidth(), // Allows centering
         contentAlignment = Alignment.Center
@@ -171,7 +176,7 @@ fun TitleLayout(text:String, fontFamily: FontFamily, frontColor: Color = Color(0
             text = text,
             fontFamily = fontFamily,
             fontWeight = FontWeight.Bold,
-            fontSize = 70.sp,
+            fontSize = fontSize.sp,
             textAlign = TextAlign.Center,
             style = TextStyle(
                 brush = Brush.linearGradient( // Use brush instead of color
@@ -188,7 +193,7 @@ fun TitleLayout(text:String, fontFamily: FontFamily, frontColor: Color = Color(0
             text = text,
             fontFamily = fontFamily,
             fontWeight = FontWeight.Normal,
-            fontSize = 70.sp,
+            fontSize = fontSize.sp,
             textAlign = TextAlign.Center,
             color = frontColor,
         )
