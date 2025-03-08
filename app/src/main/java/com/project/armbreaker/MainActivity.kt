@@ -19,9 +19,11 @@ import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.game.ui.GameLevelScreen
 import com.project.armbreaker.modules.game.ui.GameScreen
 import com.project.armbreaker.modules.game.ui.GameViewModel
+import com.project.armbreaker.modules.screen.data.LeaderboardViewModel
 import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
 import com.project.armbreaker.modules.screen.ui.IntroductionScreen
+import com.project.armbreaker.modules.screen.ui.LeaderboardScreen
 import com.project.armbreaker.modules.screen.ui.OptionsScreen
 
 class MainActivity : ComponentActivity() {
@@ -113,6 +115,11 @@ class MainActivity : ComponentActivity() {
                         gameViewModel = gameViewModel,
                         authViewModel = authViewModel
                     )
+                }
+                composable("leaderboard"){
+                    playGeneralMusic()
+                    val leaderboardViewModel: LeaderboardViewModel = viewModel()
+                    LeaderboardScreen(leaderboardViewModel)
                 }
             }
         }

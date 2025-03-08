@@ -145,6 +145,15 @@ fun OptionsScreen(
                     }
                     isVolumeOn = !isVolumeOn
                 }
+                //Leaderboard Button
+                ButtonLayout(
+                    text = "Leaderboard",
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    fontSize = 35
+                ){
+                    navController.navigate("leaderboard")
+                }
                 //About Button
                 ButtonLayout(
                     text = "About",
