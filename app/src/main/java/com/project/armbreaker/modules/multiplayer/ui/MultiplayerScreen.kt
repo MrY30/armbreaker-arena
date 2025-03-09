@@ -129,9 +129,13 @@ fun MultiplayerScreen(
         if(gameSession.status == "waiting"){
             DialogBox(title = {CreatorBox()}){}
         }
-        if(gameSession.status == "pending"){
+        if(gameSession.status == "pending" && multiViewModel.isOpponent){
+            DialogBox(title = {OpponentBox()}){}
+        }
+        if(gameSession.status == "pending" && !multiViewModel.isOpponent){
             DialogBox(title = {StartBox()}){}
         }
+
     }
 }
 
