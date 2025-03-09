@@ -7,10 +7,10 @@ data class GameSession (
     val opponentId: String? = null,
     val opponentName: String? = null,
     val winnerId: String? = null,
-    val status: String? = "waiting", // waiting, pending, ongoing, completed
+    val status: String? = null, // waiting, pending, ongoing, completed
 )
 
-data class OpenGame(
-    val creatorName: String ="",
-    val sessionId: String = "",
+data class GameList (
+    val sessionId: String? = null,
+    val creatorName: String? = null
 )

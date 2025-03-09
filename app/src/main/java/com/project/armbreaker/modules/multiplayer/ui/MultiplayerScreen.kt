@@ -50,7 +50,8 @@ fun MultiplayerScreen(
     navController: NavController
 ){
     val authState by authViewModel.uiState.collectAsState()
-    val openGames by multiViewModel.openGames.collectAsState()
+    val gameList by multiViewModel.gameList.collectAsState()
+    val gameSession by multiViewModel.gameSession.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -76,7 +77,7 @@ fun MultiplayerScreen(
                     .background(Color(0xaa13242F), RoundedCornerShape(10.dp))
             ){
                 /*List of Game Sessions*/
-                if (openGames.isEmpty()) {
+                if (gameList.isEmpty()) {
                     Text(
                         text = "No active game sessions",
                         color = Color.White,
@@ -84,12 +85,12 @@ fun MultiplayerScreen(
                     )
                 } else {
                     LazyColumn {
-                        items(openGames) { session ->
+                        items(gameList) { session ->
                             SessionCard(
                                 authState = authState,
                                 multiViewModel = multiViewModel,
-                                creatorName = session.creatorName,
-                                sessionId = session.sessionId)
+                                creatorName = session.creatorName?:"Unknown",
+                                sessionId = session.sessionId?:"Unknown")
                         }
                     }
                 }
@@ -100,9 +101,9 @@ fun MultiplayerScreen(
                 /*Popup Waiting to Join Dialog Box*/
                 //Creates the game session in the Firebase
                 //This code works pero off sa para maka preview
-                authState.email?.let {email ->
+                authState.email?.let {
                     multiViewModel.createGameSession(
-                        email,
+                        it,
                         onSuccess = { sessionId ->
                             Log.d("GameSession", "Game session created with ID: $sessionId")
                         },
@@ -113,7 +114,16 @@ fun MultiplayerScreen(
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            ButtonLayout(text = "Back"){navController.popBackStack()}
+            ButtonLayout(text = "Back"){
+                navController.popBackStack()
+                multiViewModel.clearState()
+            }
+        }
+        if(gameSession.status == "waiting"){
+            DialogBox(title = {CreatorBox()}){}
+        }
+        if(gameSession.status == "pending"){
+            DialogBox(title = {StartBox()}){}
         }
     }
 }
@@ -156,8 +166,6 @@ fun SessionCard(
                 multiViewModel.joinGameSession(
                     sessionId = sessionId,
                     opponentEmail = authState.email ?: "",
-                    onSuccess = {},
-                    onFailure = {},
                 )
             }
         ) {Text(text = "Join", fontFamily = thaleahFat, fontSize = 20.sp, color = Color(0xFFdaa520))}
