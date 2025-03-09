@@ -90,6 +90,7 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
                 }
                 ButtonLayout("MULTIPLAYER"){
                     //Insert Multiplayer Screen Here
+                    navController.navigate("multiplayer")
                 }
                 ButtonLayout("SETTINGS"){
                     navController.navigate("options")

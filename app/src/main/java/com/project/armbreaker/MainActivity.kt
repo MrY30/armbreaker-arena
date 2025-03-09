@@ -19,6 +19,8 @@ import com.project.armbreaker.modules.auth.ui.LoginScreen
 import com.project.armbreaker.modules.game.ui.GameLevelScreen
 import com.project.armbreaker.modules.game.ui.GameScreen
 import com.project.armbreaker.modules.game.ui.GameViewModel
+import com.project.armbreaker.modules.multiplayer.ui.MultiplayerScreen
+import com.project.armbreaker.modules.multiplayer.ui.MultiplayerViewModel
 import com.project.armbreaker.modules.screen.data.LeaderboardViewModel
 import com.project.armbreaker.modules.screen.ui.AboutScreen
 import com.project.armbreaker.modules.screen.ui.HomeScreen
@@ -121,6 +123,15 @@ class MainActivity : ComponentActivity() {
                     val leaderboardViewModel: LeaderboardViewModel = viewModel()
                     LeaderboardScreen(
                         leaderboardViewModel = leaderboardViewModel,
+                        navController = navController
+                    )
+                }
+                composable("multiplayer"){
+                    playGeneralMusic()
+                    val multiplayerViewModel: MultiplayerViewModel = viewModel()
+                    MultiplayerScreen(
+                        multiplayerViewModel = multiplayerViewModel,
+                        authViewModel = authViewModel,
                         navController = navController
                     )
                 }
