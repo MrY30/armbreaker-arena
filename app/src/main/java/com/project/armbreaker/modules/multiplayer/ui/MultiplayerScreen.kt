@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,6 +53,12 @@ fun MultiplayerScreen(
     val authState by authViewModel.uiState.collectAsState()
     val gameList by multiViewModel.gameList.collectAsState()
     val gameSession by multiViewModel.gameSession.collectAsState()
+
+    LaunchedEffect(gameSession.sessionId) {
+        if(!gameSession.sessionId.isNullOrEmpty()){
+            multiViewModel.updateGameSession()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(

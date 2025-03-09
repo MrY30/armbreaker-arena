@@ -26,6 +26,8 @@ class MultiplayerViewModel : ViewModel() {
 
     init {
         fetchOpenGames()
+        //initialize that gamesession flow state is empty
+        _gameSession.update {GameSession()}
     }
 
     private fun fetchOpenGames() {
@@ -44,6 +46,32 @@ class MultiplayerViewModel : ViewModel() {
                                 sessionId = doc.id
                             )
                         }
+                    }
+                }
+            }
+    }
+
+    fun updateGameSession() {
+        val sessionId = _gameSession.value.sessionId ?: return // Avoid null pointer exception
+
+        db.collection("GameSession")
+            .document(sessionId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("Firestore", "Error fetching game session", error)
+                    return@addSnapshotListener
+                }
+
+                snapshot?.let {
+                    _gameSession.update { currentSession ->
+                        currentSession.copy(
+                            creatorId = it.getString("creatorId") ?: "",
+                            creatorName = it.getString("creatorName") ?: "",
+                            opponentId = it.getString("opponentId") ?: "",
+                            opponentName = it.getString("opponentName") ?: "",
+                            winnerId = it.getString("winnerId") ?: "",
+                            status = it.getString("status") ?: ""
+                        )
                     }
                 }
             }
