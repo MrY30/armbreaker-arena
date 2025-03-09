@@ -48,6 +48,7 @@ import com.project.armbreaker.R
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.modules.game.data.GameDataSource
 import com.project.armbreaker.modules.game.data.LevelsList
+import com.project.armbreaker.modules.screen.ui.ButtonLayout
 import com.project.armbreaker.modules.screen.ui.TitleLayout
 import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
@@ -93,23 +94,27 @@ fun GameLevelScreen(
                     contentDescription = "Main Background",
                 )
                 Column (
-                    modifier = Modifier.fillMaxSize().statusBarsPadding(),
+                    modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     TitleLayout(
                         text = "Choose A Level",
                         fontFamily = pixelGame,
                         fontSize = 60
                     )
-                    Spacer(modifier = Modifier.height(15.dp))
                     GameLevelList(
-                        modifier = Modifier.navigationBarsPadding(),
                         levelsList = LevelsList().loadLevels(),
                         unlockedLevels = updatedLevel!!, // Now safe to use
                         navController = navController,
-                        gameViewModel = gameViewModel
+                        gameViewModel = gameViewModel,
+                        modifier = Modifier.weight(1f)
                     )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    ButtonLayout(text = "Back"){
+                        navController.popBackStack()
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
@@ -138,7 +143,7 @@ fun GameLevelCard(
                 }
             },
         colors = CardDefaults.cardColors(
-            containerColor = if(isEnabled) Color(0xFFdaa520) else Color(0xff2c3e50),
+            containerColor = if(isEnabled) Color(0xFFdaa520) else Color(0xFF13242F),
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
@@ -153,14 +158,14 @@ fun GameLevelCard(
                 fontSize = 24.sp,
                 fontFamily = thaleahFat,
                 textAlign = TextAlign.Center,
-                color = if(isEnabled) Color(0xff2c3e50) else Color(0xFFdaa520)
+                color = if(isEnabled) Color(0xFF13242F) else Color(0xFFdaa520)
             )
             Text(
                 text = "${level.level}",
                 fontSize = 48.sp,
                 fontFamily = thaleahFat,
                 textAlign = TextAlign.Center,
-                color = if(isEnabled) Color(0xff2c3e50) else Color(0xFFdaa520)
+                color = if(isEnabled) Color(0xFF13242F) else Color(0xFFdaa520)
             )
         }
     }
@@ -176,7 +181,7 @@ fun GameLevelList(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
         items(levelsList) { level ->
             GameLevelCard(
@@ -195,7 +200,7 @@ fun LoadingScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White), // Background color
+            .background(Color(0xFF13242F)), // Background color
         contentAlignment = Alignment.Center
     ) {
         //Screen Background
@@ -216,12 +221,12 @@ fun LoadingScreen() {
                 text = "Loading...",
                 fontFamily = thaleahFat,
                 fontSize = 50.sp,
-                color = Color(0xffe2725b)
+                color = Color(0xFFdaa520)
             )
             LinearProgressIndicator(
                 modifier = Modifier.height(12.dp),
-                color = Color(0xffe2725b), // Customize color if needed
-                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
+                color = Color(0xFFdaa520), // Customize color if needed
+                trackColor = Color(0xFF13242F) //Background Color
             )
         }
     }

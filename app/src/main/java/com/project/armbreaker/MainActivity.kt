@@ -119,7 +119,10 @@ class MainActivity : ComponentActivity() {
                 composable("leaderboard"){
                     playGeneralMusic()
                     val leaderboardViewModel: LeaderboardViewModel = viewModel()
-                    LeaderboardScreen(leaderboardViewModel)
+                    LeaderboardScreen(
+                        leaderboardViewModel = leaderboardViewModel,
+                        navController = navController
+                    )
                 }
             }
         }
