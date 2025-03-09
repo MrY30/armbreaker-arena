@@ -128,9 +128,9 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("multiplayer"){
                     playGeneralMusic()
-                    val multiplayerViewModel: MultiplayerViewModel = viewModel()
+                    val multiViewModel: MultiplayerViewModel = viewModel()
                     MultiplayerScreen(
-                        multiplayerViewModel = multiplayerViewModel,
+                        multiViewModel = multiViewModel,
                         authViewModel = authViewModel,
                         navController = navController
                     )

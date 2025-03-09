@@ -9,3 +9,8 @@ data class GameSession (
     val winnerId: String? = null,
     val status: String? = "waiting", // waiting, pending, ongoing, completed
 )
+
+data class OpenGame(
+    val creatorName: String ="",
+    val sessionId: String = "",
+)

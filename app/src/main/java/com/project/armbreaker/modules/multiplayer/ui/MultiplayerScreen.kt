@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -35,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.project.armbreaker.R
+import com.project.armbreaker.modules.auth.ui.AuthState
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
-import com.project.armbreaker.modules.multiplayer.data.GameSession
 import com.project.armbreaker.modules.screen.ui.ButtonLayout
 import com.project.armbreaker.modules.screen.ui.TitleLayout
 import com.project.armbreaker.ui.theme.pixelGame
@@ -44,15 +45,14 @@ import com.project.armbreaker.ui.theme.thaleahFat
 
 @Composable
 fun MultiplayerScreen(
-    multiplayerViewModel: MultiplayerViewModel,
+    multiViewModel: MultiplayerViewModel,
     authViewModel: AuthViewModel,
     navController: NavController
 ){
     val authState by authViewModel.uiState.collectAsState()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ){
+    val openGames by multiViewModel.openGames.collectAsState()
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier
                 .fillMaxSize(),
@@ -60,7 +60,6 @@ fun MultiplayerScreen(
             painter = painterResource(id = R.drawable.screen_background),
             contentDescription = "Main Background",
         )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,13 +73,10 @@ fun MultiplayerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
-                    .background(
-                        color = Color(0xaa13242F),
-                        shape = RoundedCornerShape(10.dp)
-                    )
+                    .background(Color(0xaa13242F), RoundedCornerShape(10.dp))
             ){
                 /*List of Game Sessions*/
-                if (multiplayerViewModel.openGames.isEmpty()) {
+                if (openGames.isEmpty()) {
                     Text(
                         text = "No active game sessions",
                         color = Color.White,
@@ -88,11 +84,12 @@ fun MultiplayerScreen(
                     )
                 } else {
                     LazyColumn {
-                        items(multiplayerViewModel.openGames.size) { index ->
-                            val sessions = multiplayerViewModel.openGames[index]
+                        items(openGames) { session ->
                             SessionCard(
-                                creatorName = sessions.creatorName,
-                                sessionId = sessions.sessionId)
+                                authState = authState,
+                                multiViewModel = multiViewModel,
+                                creatorName = session.creatorName,
+                                sessionId = session.sessionId)
                         }
                     }
                 }
@@ -104,7 +101,7 @@ fun MultiplayerScreen(
                 //Creates the game session in the Firebase
                 //This code works pero off sa para maka preview
                 authState.email?.let {email ->
-                    multiplayerViewModel.createGameSession(
+                    multiViewModel.createGameSession(
                         email,
                         onSuccess = { sessionId ->
                             Log.d("GameSession", "Game session created with ID: $sessionId")
@@ -118,37 +115,22 @@ fun MultiplayerScreen(
             Spacer(modifier = Modifier.height(10.dp))
             ButtonLayout(text = "Back"){navController.popBackStack()}
         }
-
-        //This is for Dialogue Box
-//        DialogBox (title = { StartBox() }){
-//            //Cancel Button
-//        }
-
     }
-}
-
-//The Dialog Box Format
-@Composable
-fun DialogBox(title: @Composable () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        modifier = Modifier,
-        onDismissRequest = onDismiss,
-        confirmButton = {},
-        title = title,
-    )
 }
 
 //This composable is for displaying sessions
 @Composable
-fun SessionCard(creatorName:String, sessionId: String){
+fun SessionCard(
+    authState: AuthState,
+    multiViewModel: MultiplayerViewModel,
+    creatorName:String,
+    sessionId: String
+){
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .background(
-                color = Color(0xFFdaa520),
-                shape = RoundedCornerShape(10.dp)
-            ),
+            .background(Color(0xFFdaa520), RoundedCornerShape(10.dp)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -171,9 +153,26 @@ fun SessionCard(creatorName:String, sessionId: String){
             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
             onClick = {
                 //Opponent Joins Game
+                multiViewModel.joinGameSession(
+                    sessionId = sessionId,
+                    opponentEmail = authState.email ?: "",
+                    onSuccess = {},
+                    onFailure = {},
+                )
             }
         ) {Text(text = "Join", fontFamily = thaleahFat, fontSize = 20.sp, color = Color(0xFFdaa520))}
     }
+}
+
+//The Dialog Box Format
+@Composable
+fun DialogBox(title: @Composable () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        modifier = Modifier,
+        onDismissRequest = onDismiss,
+        confirmButton = {},
+        title = title,
+    )
 }
 
 //If player is Opponent
