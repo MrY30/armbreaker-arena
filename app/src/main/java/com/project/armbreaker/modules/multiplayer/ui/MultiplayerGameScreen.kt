@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -195,7 +196,7 @@ fun MultiplayerGameScreen(
                     .offset(y = 20.dp),
                 fontSize = 35.sp,
                 textAlign = TextAlign.Center,
-                color = Color(0xffcd7f32)
+                color = Color(0xFFf5f5f0),
             )
 
             //Arm Level Image
@@ -234,17 +235,19 @@ fun MultiplayerGameScreen(
                         .weight(1f)
                         .wrapContentHeight(Alignment.Bottom)
                 )
-                Text(
-                    text = "Winner: ${gameSession.winnerName}", //Use game view model to change text status
-                    fontFamily = thaleahFat,
-                    color = Color.White,
-                    fontSize = 40.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .wrapContentHeight(Alignment.Bottom)
-                )
+                if(multiViewModel.displayText == "You Lose" || multiViewModel.displayText == "You Win!") {
+                    Text(
+                        text = "Winner: ${gameSession.winnerName}", //Use game view model to change text status
+                        fontFamily = thaleahFat,
+                        color = Color.White,
+                        fontSize = 40.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .weight(1f)
+                            .offset(y = 12.dp)
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .weight(1f)
@@ -254,16 +257,14 @@ fun MultiplayerGameScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    //hide for now, design first
-                    if(multiViewModel.displayText == "You Lose" || multiViewModel.displayText == "You Win!"){
-                        //chooses either returning to game level screen or restart game
+                    if(multiViewModel.displayText == "You Lose" || multiViewModel.displayText == "You Win!") {
                         GameButton(
                             buttonImage = painterResource(R.drawable.red_button),
                             iconVector = Exit,
                             size = 60
-                        ){
+                        ) {
                             multiViewModel.leaveGame()
-                            navController.popBackStack()
+                            navController.navigate("multiplayer")
                         }
                     }
                 }

@@ -32,6 +32,12 @@ class MultiplayerViewModel : ViewModel() {
     private val _gameSession = MutableStateFlow(GameSession())
     val gameSession: StateFlow<GameSession> = _gameSession.asStateFlow()
 
+    //game states
+    private var gameStart by mutableStateOf(false)
+    var gameReady by mutableStateOf(false)
+    var displayText by mutableStateOf("Tap if Ready")
+    var playerScore by mutableStateOf(0f)
+    var winnerName by mutableStateOf("")
     //Checking for necessary states
     var isOpponent by mutableStateOf(false)
 
@@ -81,7 +87,7 @@ class MultiplayerViewModel : ViewModel() {
                             creatorName = it.getString("creatorName") ?: "",
                             opponentId = it.getString("opponentId") ?: "",
                             opponentName = it.getString("opponentName") ?: "",
-                            winnerName = it.getString("winnerId") ?: "",
+                            winnerName = it.getString("winnerName") ?: "",
                             status = it.getString("status") ?: "",
                             ready = it.getLong("ready")?.toInt() ?: 0,
                             score = it.getLong("score")?.toInt() ?: 0
@@ -99,10 +105,13 @@ class MultiplayerViewModel : ViewModel() {
                         }
                         if(playerScore <= -35f){
                             displayText = "You Win!"
-
-                        }
-                        if(playerScore >= 35f){
+                        }else if (playerScore >= 35f){
                             displayText = "You Lose"
+                        }
+                        if(_gameSession.value.score == 35 ){
+                            getWinner("opponentName")
+                        }else if(_gameSession.value.score == -35 ){
+                            getWinner("creatorName")
                         }
 
                     }
@@ -175,18 +184,13 @@ class MultiplayerViewModel : ViewModel() {
 
     fun clearState(){
         _gameSession.update { GameSession() }
+        isOpponent = false
+        gameStart = false
+        gameReady = false
+        displayText = "Tap if Ready"
+        playerScore = 0f
+        winnerName = ""
     }
-
-    //Game Concept
-    //text = "Tap if Ready" if tap, text = "Waiting for other player",
-    // if both tap, text = "3" then text = "Tap Fast!"
-
-    private var gameStart by mutableStateOf(false)
-    var gameReady by mutableStateOf(false)
-
-    var displayText by mutableStateOf("Tap if Ready")
-    var playerScore by mutableStateOf(0f)
-
 
     fun tapToReady(){
         val sessionId = _gameSession.value.sessionId ?: return
@@ -219,28 +223,8 @@ class MultiplayerViewModel : ViewModel() {
             .addOnSuccessListener {}
     }
 
-    /*
-    from creators perspective:
-    if tap =  -1, correct implementation
-    thus, -35 is Win 35 is Lose
-    if (playScore <= -35) He should win
-
-    from opponent perspective:
-    if tap = 1, wrong implementation
-    thus, 35 is win -35 is lose
-     */
-
     fun tapGameBox() {
         if(isOpponent) changeScore(1) else changeScore(-1)
-    }
-
-    fun updateWinner(winner:String){
-        val sessionId = _gameSession.value.sessionId ?: return
-        db.collection("GameSession").document(sessionId)
-            .update("winnerId", winner)
-            .addOnSuccessListener {
-                _gameSession.update { it.copy(winnerName = it.creatorName) }
-            }
     }
 
     //DELETION FUNCTIONS
@@ -263,5 +247,19 @@ class MultiplayerViewModel : ViewModel() {
                 clearState()
             }
             .addOnFailureListener { Log.e("Firestore", "Failed to leave game", it) }
+    }
+
+    private fun getWinner(field:String){
+        val sessionId = _gameSession.value.sessionId ?: return
+        //gets the winner based on whether creator or opponent
+        db.collection("GameSession").document(sessionId)
+            .get()
+            .addOnSuccessListener {winner ->
+                winnerName = winner.getString(field).toString()
+            }
+        //updates database who wins
+        db.collection("GameSession").document(sessionId)
+            .update("winnerName", winnerName)
+            .addOnSuccessListener {}
     }
 }
