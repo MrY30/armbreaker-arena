@@ -123,19 +123,18 @@ fun MultiplayerScreen(
         if(gameSession.status == "waiting"){
             DialogBox(title = {CreatorBox()})
         }
-        else if(gameSession.status == "pending" && multiViewModel.isOpponent){
+        if(gameSession.status == "pending" && multiViewModel.isOpponent){
             DialogBox(title = {OpponentBox()})
         }
-        else if(gameSession.status == "pending" && !multiViewModel.isOpponent){
+        if(gameSession.status == "pending" && !multiViewModel.isOpponent){
             DialogBox(title = { StartBox(){
                 //change status to ongoing
                 multiViewModel.ongoingGame()
             }})
         }
-        else if(gameSession.status == "ongoing"){
+        if(gameSession.status == "ongoing"){
             navController.navigate("multiplayerGame")
         }
-        else{/*remain blank*/}
     }
 }
 
@@ -204,7 +203,8 @@ fun OpponentBox(){
             text = "Waiting to Accept...",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Spacer(modifier = Modifier.height(20.dp))
         CircularProgressIndicator(
@@ -229,7 +229,8 @@ fun CreatorBox(){
             text = "Waiting for Player 2...",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Spacer(modifier = Modifier.height(20.dp))
         CircularProgressIndicator(
@@ -254,7 +255,8 @@ fun StartBox(clickButton: () -> Unit){
             text = "Username",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
