@@ -6,9 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.project.armbreaker.modules.multiplayer.data.GameList
 import com.project.armbreaker.modules.multiplayer.data.GameSession
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +21,8 @@ import kotlinx.coroutines.launch
 
 class MultiplayerViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
+
+    private var gameSessionListener: ListenerRegistration? = null
 
     //This is for the list of games to display
     private val _gameList = MutableStateFlow<List<GameList>>(emptyList())
@@ -32,9 +38,11 @@ class MultiplayerViewModel : ViewModel() {
     init {
         fetchOpenGames()
         updateGameSession()
-        //initialize that gamesession flow state is empty
-        //_gameSession.update {GameSession()}
     }
+
+    //updateGameSession()
+    //initialize that gamesession flow state is empty
+    //_gameSession.update {GameSession()}
 
     private fun fetchOpenGames() {
         db.collection("GameSession")
@@ -60,27 +68,39 @@ class MultiplayerViewModel : ViewModel() {
     private fun updateGameSession() {
         val sessionId = _gameSession.value.sessionId ?: return // Avoid null pointer exception
 
-        db.collection("GameSession")
+        gameSessionListener?.remove() // Remove existing listener before adding a new one
+
+        gameSessionListener = db.collection("GameSession")
             .document(sessionId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("Firestore", "Error fetching game session", error)
                     return@addSnapshotListener
                 }
-
                 snapshot?.let {
                     _gameSession.update { currentSession ->
                         currentSession.copy(
+                            sessionId = sessionId,
                             creatorId = it.getString("creatorId") ?: "",
                             creatorName = it.getString("creatorName") ?: "",
                             opponentId = it.getString("opponentId") ?: "",
                             opponentName = it.getString("opponentName") ?: "",
                             winnerId = it.getString("winnerId") ?: "",
-                            status = it.getString("status") ?: ""
+                            status = it.getString("status") ?: "",
+                            ready = it.getLong("ready")?.toInt() ?: 0,
+                            score = it.getLong("score")?.toInt() ?: 0
                         )
+                    }
+                    if (_gameSession.value.ready == 2 && !gameStart) {
+                        startGame()
                     }
                 }
             }
+    }
+
+    override fun onCleared() {
+        gameSessionListener?.remove()
+        super.onCleared()
     }
 
     fun createGameSession(creatorEmail: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
@@ -92,12 +112,14 @@ class MultiplayerViewModel : ViewModel() {
                 creatorName = username,
                 status = "waiting"
             )
-            //Update local state
-            _gameSession.update { newSession }
 
             db.collection("GameSession").document(sessionId)
                 .set(newSession)
-                .addOnSuccessListener { onSuccess(sessionId) }
+                .addOnSuccessListener {
+                    _gameSession.update { newSession }
+                    updateGameSession()  // Attach listener after creation
+                    onSuccess(sessionId)
+                }
                 .addOnFailureListener { onFailure(it) }
         }, onFailure)
     }
@@ -114,15 +136,13 @@ class MultiplayerViewModel : ViewModel() {
     }
     //Copilot Version
     fun joinGameSession(sessionId: String, opponentEmail: String) {
+        _gameSession.update { it.copy(sessionId = sessionId) }
+        val newSessionId = _gameSession.value.sessionId ?: return
         fetchUserDetails(opponentEmail, { userId, username ->
-            db.collection("GameSession").document(sessionId)
+            db.collection("GameSession").document(newSessionId)
                 .update("opponentId", userId, "opponentName", username, "status", "pending")
                 .addOnSuccessListener {
-                    _gameSession.update { it.copy(
-                        opponentId = userId,
-                        opponentName = username,
-                        status = "pending"
-                    ) }
+                    updateGameSession()
                     isOpponent = true
                 }
                 .addOnFailureListener { Log.e("Firestore", "Failed to join game session", it) }
@@ -143,5 +163,52 @@ class MultiplayerViewModel : ViewModel() {
 
     fun clearState(){
         _gameSession.update { GameSession() }
+    }
+
+    //Game Concept
+    //text = "Tap if Ready" if tap, text = "Waiting for other player",
+    // if both tap, text = "3" then text = "Tap Fast!"
+
+    var gameStart by mutableStateOf(false)
+    var gameReady by mutableStateOf(false)
+
+    var displayText by mutableStateOf("Tap if Ready")
+    var playerScore by mutableStateOf(0f)
+
+
+    fun tapToReady(){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("ready",  FieldValue.increment(1))
+            .addOnSuccessListener {
+                displayText = "Waiting for other player"
+                gameReady = true
+            }
+    }
+    fun startGame() {
+        playerScore = 0f // This will serve as the rotation angle of the game
+        displayText = "3"
+
+        viewModelScope.launch {
+            val countdown = listOf("3", "2", "1", "Fight!")
+            for (num in countdown) {
+                displayText = num
+                delay(1000)
+            }
+            displayText = "TAP FAST!"
+            gameStart = true
+        }
+    }
+
+    fun changeScore(score:Long){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("score",  FieldValue.increment(score))
+            .addOnSuccessListener {}
+    }
+
+    fun tapGameBox() {
+        if(isOpponent) changeScore(-1) else changeScore(1)
+        playerScore = _gameSession.value.score.toFloat()
     }
 }

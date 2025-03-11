@@ -8,6 +8,8 @@ data class GameSession (
     val opponentName: String? = null,
     val winnerId: String? = null,
     val status: String? = null, // waiting, pending, ongoing, completed
+    val ready: Int = 0, //0 = not ready, 1 = 1 player is ready, 2 = both players are ready
+    val score: Int = 0,
 )
 
 data class GameList (

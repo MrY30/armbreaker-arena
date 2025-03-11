@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
             val authState by authViewModel.uiState.collectAsState()
             val authEmail = authState.email
             val navController = rememberNavController()
+            val multiViewModel: MultiplayerViewModel = viewModel()
 
             val gameViewModel: GameViewModel = viewModel()
 
@@ -130,7 +131,6 @@ class MainActivity : ComponentActivity() {
                 //Multiplayer Composables
                 composable("multiplayer"){
                     playGeneralMusic()
-                    val multiViewModel: MultiplayerViewModel = viewModel()
                     MultiplayerScreen(
                         multiViewModel = multiViewModel,
                         authViewModel = authViewModel,
@@ -139,7 +139,10 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("multiplayerGame"){
                     playGameMusic()
-                    MultiplayerGameScreen()
+                    MultiplayerGameScreen(
+                        multiViewModel = multiViewModel,
+                        navController = navController
+                    )
                 }
             }
         }
