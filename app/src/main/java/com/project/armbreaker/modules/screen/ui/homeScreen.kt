@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -19,6 +20,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,11 +44,18 @@ import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
     //This is also for the exit feature
     val activity = LocalActivity.current
+    var showExitDialog by remember { mutableStateOf(false) }
 
     Box (
         modifier = Modifier
@@ -104,9 +116,17 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
 //                ButtonLayout("ABOUT"){
 //                    navController.navigate("about")
 //                }
+
                 //EXIT BUTTON
-                ButtonLayout("EXIT"){
-                    showExitDialog(activity)
+                if (showExitDialog) {
+                    ExitDialog(
+                        activity = activity,
+                        onDismiss = { showExitDialog = false }
+                    )
+                }
+
+                ButtonLayout("EXIT") {
+                    showExitDialog = true
                 }
             }
         }
@@ -114,17 +134,98 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
 }
 
 //This is for the exit feature
-fun showExitDialog(activity: Activity?) {
-    activity?.let {
-        AlertDialog.Builder(it)
-            .setTitle("Exit Game")
-            .setMessage("Are you sure you want to exit?")
-            .setPositiveButton("Yes") { _, _ ->
-                it.finish() // Close the app
+@Composable
+fun ExitDialog(
+    activity: Activity?,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White,
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Gradient text background
+                Text(
+                    text = "Exit Game",
+                    fontFamily = thaleahFat,
+                    fontSize = 34.sp,
+                    style = TextStyle(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFFFFD700),
+                                Color(0xFFFFA500),
+                                Color(0xFFFFFF00),
+                                Color(0xFFDAA520)
+                            )
+                        )
+                    )
+                )
+                // Solid color text foreground
+                Text(
+                    text = "Exit Game",
+                    fontFamily = thaleahFat,
+                    fontSize = 34.sp,
+                    color = Color(0xFF13242F),
+                    modifier = Modifier.offset(y = (-8).dp)
+                )
             }
-            .setNegativeButton("No", null)
-            .show()
-    }
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to exit?",
+                fontFamily = thaleahFat,
+                fontSize = 20.sp,
+                color = Color(0xFF13242F),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    activity?.finish()
+                    onDismiss()
+                },
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .border(2.dp, Color(0xFF13242F), RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Text(
+                    text = "YES",
+                    fontFamily = thaleahFat,
+                    fontSize = 24.sp,
+                    color = Color(0xFF13242F),
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .border(2.dp, Color(0xFF13242F), RoundedCornerShape(12.dp)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                )
+            ) {
+                Text(
+                    text = "NO",
+                    fontFamily = thaleahFat,
+                    fontSize = 24.sp,
+                    color = Color(0xFF13242F),
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
+        }
+    )
 }
 
 @Composable
