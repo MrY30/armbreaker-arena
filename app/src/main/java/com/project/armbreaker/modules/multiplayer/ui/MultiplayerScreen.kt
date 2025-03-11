@@ -54,12 +54,6 @@ fun MultiplayerScreen(
     val gameList by multiViewModel.gameList.collectAsState()
     val gameSession by multiViewModel.gameSession.collectAsState()
 
-    LaunchedEffect(gameSession.sessionId) {
-        if(!gameSession.sessionId.isNullOrEmpty()){
-            multiViewModel.updateGameSession()
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier
@@ -139,9 +133,8 @@ fun MultiplayerScreen(
             }})
         }
         if(gameSession.status == "ongoing"){
-            navController.navigate("game")
+            navController.navigate("multiplayerGame")
         }
-
     }
 }
 
@@ -196,7 +189,6 @@ fun DialogBox(title: @Composable () -> Unit) {
         modifier = Modifier,
         onDismissRequest = { },
         confirmButton = title,
-        title = title,
     )
 }
 
@@ -211,7 +203,8 @@ fun OpponentBox(){
             text = "Waiting to Accept...",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Spacer(modifier = Modifier.height(20.dp))
         CircularProgressIndicator(
@@ -236,7 +229,8 @@ fun CreatorBox(){
             text = "Waiting for Player 2...",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Spacer(modifier = Modifier.height(20.dp))
         CircularProgressIndicator(
@@ -261,7 +255,8 @@ fun StartBox(clickButton: () -> Unit){
             text = "Username",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Text(
             modifier = Modifier.fillMaxWidth(),

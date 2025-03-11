@@ -31,8 +31,9 @@ class MultiplayerViewModel : ViewModel() {
 
     init {
         fetchOpenGames()
+        updateGameSession()
         //initialize that gamesession flow state is empty
-        _gameSession.update {GameSession()}
+        //_gameSession.update {GameSession()}
     }
 
     private fun fetchOpenGames() {
@@ -56,7 +57,7 @@ class MultiplayerViewModel : ViewModel() {
             }
     }
 
-    fun updateGameSession() {
+    private fun updateGameSession() {
         val sessionId = _gameSession.value.sessionId ?: return // Avoid null pointer exception
 
         db.collection("GameSession")
