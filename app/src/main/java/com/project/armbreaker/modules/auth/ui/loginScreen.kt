@@ -201,8 +201,8 @@ fun LoginScreen(
                 value = password,
                 onValueChange = { password = it },
                 label = "Password",
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isPassword = true
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -315,13 +315,16 @@ fun AuthTextField(
     onValueChange: (String) -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    isPassword: Boolean = false
 ) {
+    var showPassword by remember { mutableStateOf(false) }
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label, fontFamily = thaleahFat) },
-        visualTransformation = visualTransformation,
+        visualTransformation = if (isPassword && !showPassword) PasswordVisualTransformation() else visualTransformation,
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(
@@ -334,7 +337,16 @@ fun AuthTextField(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
-        keyboardOptions = KeyboardOptions.Default,
+        trailingIcon = {
+            if (isPassword) {
+                TextToggleButton(
+                    showPassword = showPassword,
+                    onToggle = { showPassword = !showPassword }
+                )
+            }
+        },
+        keyboardOptions = if (isPassword) KeyboardOptions(autoCorrect = false)
+        else KeyboardOptions.Default,
         singleLine = true,
         textStyle = LocalTextStyle.current.copy(
             fontSize = 16.sp
@@ -342,6 +354,27 @@ fun AuthTextField(
     )
 }
 
+@Composable
+private fun TextToggleButton(
+    showPassword: Boolean,
+    onToggle: () -> Unit
+) {
+    Button(
+        onClick = onToggle,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = Color(0xFF13242F)
+        ),
+        elevation = null,
+        modifier = Modifier.padding(end = 8.dp)
+    ) {
+        Text(
+            text = if (showPassword) "HIDE" else "SHOW",
+            fontFamily = thaleahFat,
+            fontSize = 12.sp
+        )
+    }
+}
 
 
 
