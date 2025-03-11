@@ -128,6 +128,18 @@ class MultiplayerViewModel : ViewModel() {
         }, {Log.e("Firestore", "Failed to join game session", it)})
     }
 
+    fun ongoingGame() {
+        val sessionId = _gameSession.value.sessionId ?: return
+
+        db.collection("GameSession").document(sessionId)
+            .update("status", "ongoing")
+            .addOnSuccessListener {
+                _gameSession.update { it.copy(status = "ongoing") }
+            }
+            .addOnFailureListener { Log.e("Firestore", "Failed to update game status", it) }
+    }
+
+
     fun clearState(){
         _gameSession.update { GameSession() }
     }

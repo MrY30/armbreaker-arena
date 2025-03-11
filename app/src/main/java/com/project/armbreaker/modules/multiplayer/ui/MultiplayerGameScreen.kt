@@ -1,9 +1,6 @@
-package com.project.armbreaker.modules.game.ui
+package com.project.armbreaker.modules.multiplayer.ui
 
-import android.util.Log
 import android.widget.ImageView
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +19,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,24 +29,42 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.project.armbreaker.R
+import com.project.armbreaker.modules.game.ui.PixelatedCircle
+import com.project.armbreaker.modules.game.ui.ProgressBar
 import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
 
+/*
+TASK TO DO:
+- Redesign game screen
+- Indicate Opponent name [DONE]
+- If account isOpponent, it will display the creatorName
+- If account isCreator, it will display the opponentName
+- Change Medal set to 'M' for Multiplayer [DONE]
+- Remove the pause features. Strictly game only [DONE]
+- Add the Tap if Ready
+ - If clicked, player will be in ready state and if both clicked game will start
+
+*/
 
 @Composable
-fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
-    Log.w("LOG","${gameViewModel.gameLevel}")
+fun MultiplayerGameScreen(
+    /*navController: NavController,
+    gameViewModel: GameViewModel*/
+){
+
     //ROTATION BOX
-    val animateArm by animateFloatAsState(
-        targetValue = gameViewModel.rotationAngle,
-        animationSpec = tween(500)
-    )
+    //Hide for now. Design first
+//    val animateArm by animateFloatAsState(
+//        targetValue = gameViewModel.rotationAngle,
+//        animationSpec = tween(500)
+//    )
 
     //This is the Main Game Screen
     Box (
@@ -60,11 +74,12 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ){
-                if(!gameViewModel.gameStarted){
-                    gameViewModel.startGame()
-                }else{
-                    gameViewModel.tapGameBox()
-                }
+                //hide for now, design first
+//                if(!gameViewModel.gameStarted){
+//                    gameViewModel.startGame()
+//                }else{
+//                    gameViewModel.tapGameBox()
+//                }
             }
     ){
         //Adding the Background Crowd GIF
@@ -99,23 +114,6 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            //Pause Button [Temporary Back and Restart Buttons]
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-                    .padding(horizontal = 16.dp)
-                    .offset(y = 20.dp)
-            ){
-                //This is the Pause Button
-                GameButton(
-                    buttonImage = painterResource(R.drawable.purple_button),
-                    iconPainter = painterResource(R.drawable.pause_icon),
-                    size = 50
-                ) {
-                    gameViewModel.pauseGame()
-                }
-            }
             //Belt Level Image
             Box(
                 modifier = Modifier
@@ -156,20 +154,11 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                         .wrapContentSize(Alignment.Center),
                 ) {
                     Text(
-                        text = "LEVEL",
-                        fontFamily = thaleahFat,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontSize = 35.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFFf5f5f0),
-                    )
-                    Text(
-                        text = "${gameViewModel.gameLevel}",
+                        text = "M",
                         fontFamily = pixelGame,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontSize = 50.sp,
+                        fontSize = 100.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFFf5f5f0),
                     )
@@ -178,9 +167,23 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
             }
 
             //Progress Bar
-            ProgressBar(progress = (1-((gameViewModel.rotationAngle)+35)/70), modifier = Modifier
+            ProgressBar(progress = 0.5f/*(1-((gameViewModel.rotationAngle)+35)/70)*/, modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
+            )
+
+            //Opponent Name
+            Text(
+                text = "Opponent Name", //Insert the Opponent name condition
+                fontFamily = thaleahFat,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+                    .offset(y = 20.dp),
+                fontSize = 35.sp,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF13242F)
             )
 
             //Arm Level Image
@@ -188,10 +191,11 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 modifier = Modifier
                     .weight(12f)
                     .fillMaxSize()
+                    //.border(1.dp, Color.Black)
                     .wrapContentHeight(Alignment.CenterVertically)
                     .offset(y = 60.dp)
                     .graphicsLayer(
-                        rotationZ = animateArm,
+                        rotationZ = /*animateArm*/0f,
                         transformOrigin = TransformOrigin(pivotFractionX = 0.85f, pivotFractionY = 1.0f)
                     ),
                 painter = painterResource(id = R.drawable.arm_player_v2),
@@ -199,96 +203,69 @@ fun GameScreen(navController: NavController, gameViewModel: GameViewModel){
                 contentScale = ContentScale.Fit
             )
         }
-        //All conditions including Pause, Win, Lose
-        if(gameViewModel.countdownText != "TAP FAST!"){
-            //STARTING BOX. CLICK TO START COUNTDOWN
-            Column(
+
+        //STARTING BOX. CLICK IF PLAYER IS READY
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.75f))
+        ){
+            Text(
+                text = "Waiting for player", //Use game view model to change text status
+                fontFamily = thaleahFat,
+                color = Color.White,
+                fontSize = 40.sp,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.75f))
-            ){
-                Text(
-                    text = gameViewModel.countdownText,
-                    fontFamily = thaleahFat,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 50.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .wrapContentHeight(Alignment.Bottom)
-                )
-                Row(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .offset(y = (-100).dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    if(gameViewModel.countdownText == "Pause"){
-                        //This is the Exit Button
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.red_button),
-                            iconVector = Exit,
-                            size = 60
-                        ){
-                            navController.popBackStack() //returns to game level screen
-                        }
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.green_button),
-                            iconPainter = painterResource(R.drawable.play_icon),
-                            size = 60
-                        ){
-                            gameViewModel.resumeGame()
-                        }
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.yellow_button),
-                            iconVector = Restart,
-                            size = 60
-                        ){
-                            gameViewModel.restartGame()
-                        }
-                    }
-                    if(gameViewModel.countdownText == "You Lose"){
-                        //chooses either returning to game level screen or restart game
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.red_button),
-                            iconVector = Exit,
-                            size = 60
-                        ){
-                            navController.popBackStack()
-                        }
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.yellow_button),
-                            iconVector = Restart,
-                            size = 60
-                        ){
-                            gameViewModel.restartGame()
-                        }
-                    }
-                    if(gameViewModel.countdownText == "You Win!"){
-                        //chooses either going back to game level screen or exit
-                        GameButton(
-                            buttonImage = painterResource(R.drawable.green_button),
-                            iconPainter = painterResource(R.drawable.play_icon),
-                            size = 60
-                        ){
-                            navController.popBackStack()
-                        }
-                    }
-                }
+                    .weight(1f)
+                    .wrapContentHeight(Alignment.Bottom)
+            )
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .offset(y = (-100).dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                //hide for now, design first
+//                if(gameViewModel.countdownText == "You Lose"){
+//                    //chooses either returning to game level screen or restart game
+//                    GameButton(
+//                        buttonImage = painterResource(R.drawable.red_button),
+//                        iconVector = Exit,
+//                        size = 60
+//                    ){
+//                        navController.popBackStack()
+//                    }
+//                    GameButton(
+//                        buttonImage = painterResource(R.drawable.yellow_button),
+//                        iconVector = Restart,
+//                        size = 60
+//                    ){
+//                        gameViewModel.restartGame()
+//                    }
+//                }
+//                if(gameViewModel.countdownText == "You Win!"){
+//                    //chooses either going back to game level screen or exit
+//                    GameButton(
+//                        buttonImage = painterResource(R.drawable.green_button),
+//                        iconPainter = painterResource(R.drawable.play_icon),
+//                        size = 60
+//                    ){
+//                        navController.popBackStack()
+//                    }
+//                }
             }
         }
-
     }
 }
 
-//This Area is for Preview Only
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable
-//fun Preview(){
-//    GameScreen(navController = NavController(LocalContext.current), gameViewModel = GameViewModel())
+//fun PreviewGame(){
+//    //Preview Without the waiting screen
+//    MultiplayerGameScreen()
 //}

@@ -63,10 +63,10 @@ fun PixelatedCircle(
 @Composable
 fun ProgressBar(progress: Float, height: Int = 25, modifier: Modifier = Modifier) {
     val backColors = listOf(
-        Color(0xFFFFD700),
-        Color(0xFFFFA500),
-        Color(0xFFFFFF00),
-        Color(0xFFDAA520)
+        Color(0xFFD91A1A),
+        Color(0xFFB41C1C),
+        Color(0xFF8F1D1E),
+        Color(0xFF6B1F20),
     )
 
     val foreColors = listOf(

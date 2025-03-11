@@ -167,10 +167,11 @@ fun TitleLayout(
     text:String,
     fontFamily: FontFamily,
     frontColor: Color = Color(0xFF13242F),
-    fontSize: Int = 70
+    fontSize: Int = 70,
+    modifier: Modifier = Modifier
     ){
     Box(
-        modifier = Modifier.fillMaxWidth(), // Allows centering
+        modifier = modifier.fillMaxWidth(), // Allows centering
         contentAlignment = Alignment.Center
     ) {
         Text(

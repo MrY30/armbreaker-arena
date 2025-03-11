@@ -127,13 +127,19 @@ fun MultiplayerScreen(
             }
         }
         if(gameSession.status == "waiting"){
-            DialogBox(title = {CreatorBox()}){}
+            DialogBox(title = {CreatorBox()})
         }
         if(gameSession.status == "pending" && multiViewModel.isOpponent){
-            DialogBox(title = {OpponentBox()}){}
+            DialogBox(title = {OpponentBox()})
         }
         if(gameSession.status == "pending" && !multiViewModel.isOpponent){
-            DialogBox(title = {StartBox()}){}
+            DialogBox(title = { StartBox(){
+                //change status to ongoing
+                multiViewModel.ongoingGame()
+            }})
+        }
+        if(gameSession.status == "ongoing"){
+            navController.navigate("game")
         }
 
     }
@@ -185,11 +191,11 @@ fun SessionCard(
 
 //The Dialog Box Format
 @Composable
-fun DialogBox(title: @Composable () -> Unit, onDismiss: () -> Unit) {
+fun DialogBox(title: @Composable () -> Unit) {
     AlertDialog(
         modifier = Modifier,
-        onDismissRequest = onDismiss,
-        confirmButton = {},
+        onDismissRequest = { },
+        confirmButton = title,
         title = title,
     )
 }
@@ -246,7 +252,7 @@ fun CreatorBox(){
 
 //If player is Creator 2
 @Composable
-fun StartBox(){
+fun StartBox(clickButton: () -> Unit){
     Column (
         horizontalAlignment = Alignment.CenterHorizontally
     ){
@@ -265,9 +271,7 @@ fun StartBox(){
             fontSize = 25.sp
         )
         Spacer(modifier = Modifier.height(20.dp))
-        ButtonLayout("START"){
-
-        }
+        ButtonLayout("START"){clickButton()}
     }
 }
 
