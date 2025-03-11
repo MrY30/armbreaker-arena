@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.project.armbreaker.R
 import com.project.armbreaker.modules.game.ui.PixelatedCircle
@@ -55,9 +58,11 @@ TASK TO DO:
 
 @Composable
 fun MultiplayerGameScreen(
-    /*navController: NavController,
-    gameViewModel: GameViewModel*/
+    navController: NavController,
+    multiViewModel: MultiplayerViewModel,
 ){
+
+    val gameSession by multiViewModel.gameSession.collectAsState()
 
     //ROTATION BOX
     //Hide for now. Design first
@@ -75,6 +80,12 @@ fun MultiplayerGameScreen(
                 indication = null
             ){
                 //hide for now, design first
+                //text = "Tap if Ready" if tap, text = "Waiting for other player",
+                // if both tap, text = "3" then text = "Tap Fast!"
+                if(!multiViewModel.gameReady){
+                    multiViewModel.tapToReady()
+                }
+
 //                if(!gameViewModel.gameStarted){
 //                    gameViewModel.startGame()
 //                }else{
@@ -174,7 +185,7 @@ fun MultiplayerGameScreen(
 
             //Opponent Name
             Text(
-                text = "Opponent Name", //Insert the Opponent name condition
+                text = "Opponent: ${if (multiViewModel.isOpponent) gameSession.creatorName else gameSession.opponentName}", //Insert the Opponent name condition
                 fontFamily = thaleahFat,
                 modifier = Modifier
                     .fillMaxSize()
@@ -183,7 +194,7 @@ fun MultiplayerGameScreen(
                     .offset(y = 20.dp),
                 fontSize = 35.sp,
                 textAlign = TextAlign.Center,
-                color = Color(0xFF13242F)
+                color = Color(0xFF66C536)
             )
 
             //Arm Level Image
@@ -205,32 +216,33 @@ fun MultiplayerGameScreen(
         }
 
         //STARTING BOX. CLICK IF PLAYER IS READY
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.75f))
-        ){
-            Text(
-                text = "Waiting for player", //Use game view model to change text status
-                fontFamily = thaleahFat,
-                color = Color.White,
-                fontSize = 40.sp,
-                textAlign = TextAlign.Center,
+        if(multiViewModel.displayText != "TAP FAST!"){
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .weight(1f)
-                    .wrapContentHeight(Alignment.Bottom)
-            )
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .offset(y = (-100).dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                //hide for now, design first
+                    .background(Color.Black.copy(alpha = 0.75f))
+            ){
+                Text(
+                    text = multiViewModel.displayText, //Use game view model to change text status
+                    fontFamily = thaleahFat,
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .wrapContentHeight(Alignment.Bottom)
+                )
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-100).dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    //hide for now, design first
 //                if(gameViewModel.countdownText == "You Lose"){
 //                    //chooses either returning to game level screen or restart game
 //                    GameButton(
@@ -258,6 +270,7 @@ fun MultiplayerGameScreen(
 //                        navController.popBackStack()
 //                    }
 //                }
+                }
             }
         }
     }

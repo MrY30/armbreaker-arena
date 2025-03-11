@@ -6,10 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.project.armbreaker.modules.multiplayer.data.GameList
 import com.project.armbreaker.modules.multiplayer.data.GameSession
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,8 +86,12 @@ class MultiplayerViewModel : ViewModel() {
                             opponentId = it.getString("opponentId") ?: "",
                             opponentName = it.getString("opponentName") ?: "",
                             winnerId = it.getString("winnerId") ?: "",
-                            status = it.getString("status") ?: ""
+                            status = it.getString("status") ?: "",
+                            ready = it.getLong("ready")?.toInt() ?: 0,
                         )
+                    }
+                    if (_gameSession.value.ready == 2) {
+                        startGame()
                     }
                 }
             }
@@ -156,4 +163,47 @@ class MultiplayerViewModel : ViewModel() {
     fun clearState(){
         _gameSession.update { GameSession() }
     }
+
+    //Game Concept
+    //text = "Tap if Ready" if tap, text = "Waiting for other player",
+    // if both tap, text = "3" then text = "Tap Fast!"
+
+    var gameStarted by mutableStateOf(false)
+    var gameReady by mutableStateOf(false)
+
+    var displayText by mutableStateOf("Tap if Ready")
+    var playerScore by mutableStateOf(0f)
+
+
+    fun tapToReady(){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("ready",  FieldValue.increment(1))
+            .addOnSuccessListener {
+                displayText = "Waiting for other player"
+                gameReady = true
+            }
+    }
+    fun startGame() {
+        playerScore = if(isOpponent) _gameSession.value.opponentScore.toFloat() else _gameSession.value.creatorScore.toFloat()
+        displayText = "3"
+
+        viewModelScope.launch {
+            val countdown = listOf("3", "2", "1", "Fight!")
+            for (num in countdown) {
+                displayText = num
+                delay(1000)
+            }
+            displayText = "TAP FAST!"
+        }
+    }
+
+//    fun tapGameBox() {
+//        if (gameStarted && countdownText == "TAP FAST!") {
+//            rotationAngle -= 1f
+//            if (rotationAngle <= -35f) {
+//                countdownText = "You Win!"
+//            }
+//        }
+//    }
 }
