@@ -10,8 +10,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -208,8 +210,17 @@ fun LoginScreen(
             authState.errorText?.let { error ->
                 Text(
                     text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    color = Color(0xFFD32F2F), // Use a richer red that matches your theme
+                    fontFamily = thaleahFat,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    style = TextStyle(
+                        shadow = Shadow(
+                            color = Color.Black.copy(alpha = 0.25f),
+                            offset = Offset(2f, 2f),
+                            blurRadius = 4f
+                        )
+                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -326,7 +337,6 @@ fun AuthTextField(
         keyboardOptions = KeyboardOptions.Default,
         singleLine = true,
         textStyle = LocalTextStyle.current.copy(
-            fontFamily = thaleahFat,
             fontSize = 16.sp
         )
     )
