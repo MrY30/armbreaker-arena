@@ -9,11 +9,14 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -44,12 +47,8 @@ import com.project.armbreaker.modules.auth.data.AuthRepository
 import com.project.armbreaker.modules.auth.ui.AuthViewModel
 import com.project.armbreaker.ui.theme.pixelGame
 import com.project.armbreaker.ui.theme.thaleahFat
-import androidx.compose.material3.AlertDialog
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.unit.dp
+
+
 
 @Composable
 fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
@@ -133,13 +132,12 @@ fun HomeScreen(navController: NavController, authViewModel: AuthViewModel ){
     }
 }
 
-//This is for the exit feature
 @Composable
 fun ExitDialog(
     activity: Activity?,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    androidx.compose.material3.AlertDialog(  // Changed to Material3 AlertDialog
         onDismissRequest = onDismiss,
         shape = RoundedCornerShape(20.dp),
         containerColor = Color.White,
@@ -148,22 +146,7 @@ fun ExitDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Gradient text background
-                Text(
-                    text = "Exit Game",
-                    fontFamily = thaleahFat,
-                    fontSize = 34.sp,
-                    style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFFFFD700),
-                                Color(0xFFFFA500),
-                                Color(0xFFFFFF00),
-                                Color(0xFFDAA520)
-                            )
-                        )
-                    )
-                )
+
                 // Solid color text foreground
                 Text(
                     text = "Exit Game",
@@ -185,13 +168,13 @@ fun ExitDialog(
             )
         },
         confirmButton = {
+            // YES Button
             Button(
                 onClick = {
                     activity?.finish()
                     onDismiss()
                 },
                 modifier = Modifier
-                    .padding(end = 8.dp)
                     .border(2.dp, Color(0xFF13242F), RoundedCornerShape(12.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
@@ -207,10 +190,10 @@ fun ExitDialog(
             }
         },
         dismissButton = {
+            // NO Button
             Button(
                 onClick = onDismiss,
                 modifier = Modifier
-                    .padding(start = 8.dp)
                     .border(2.dp, Color(0xFF13242F), RoundedCornerShape(12.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
