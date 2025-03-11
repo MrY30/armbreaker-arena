@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -131,6 +132,19 @@ fun OptionsScreen(
                     valueRange = 0f..1f,
                     modifier = Modifier.fillMaxWidth().height(70.dp)
                 )
+
+
+                Text(
+                    text = "Volume",
+                    fontFamily = pixelGame,
+                    color = Color(0xfff5f5f0),
+                    fontSize = 24.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+
                 //Mute Button
                 ButtonLayout(
                     text = if (isVolumeOn) "Mute Music" else "Play Music",
