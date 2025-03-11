@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.project.armbreaker.modules.multiplayer.data.GameList
 import com.project.armbreaker.modules.multiplayer.data.GameSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,8 @@ import kotlinx.coroutines.launch
 
 class MultiplayerViewModel : ViewModel() {
     private val db = FirebaseFirestore.getInstance()
+
+    private var gameSessionListener: ListenerRegistration? = null
 
     //This is for the list of games to display
     private val _gameList = MutableStateFlow<List<GameList>>(emptyList())
@@ -32,9 +35,11 @@ class MultiplayerViewModel : ViewModel() {
     init {
         fetchOpenGames()
         updateGameSession()
-        //initialize that gamesession flow state is empty
-        //_gameSession.update {GameSession()}
     }
+
+    //updateGameSession()
+    //initialize that gamesession flow state is empty
+    //_gameSession.update {GameSession()}
 
     private fun fetchOpenGames() {
         db.collection("GameSession")
@@ -60,17 +65,19 @@ class MultiplayerViewModel : ViewModel() {
     private fun updateGameSession() {
         val sessionId = _gameSession.value.sessionId ?: return // Avoid null pointer exception
 
-        db.collection("GameSession")
+        gameSessionListener?.remove() // Remove existing listener before adding a new one
+
+        gameSessionListener = db.collection("GameSession")
             .document(sessionId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.e("Firestore", "Error fetching game session", error)
                     return@addSnapshotListener
                 }
-
                 snapshot?.let {
                     _gameSession.update { currentSession ->
                         currentSession.copy(
+                            sessionId = sessionId,
                             creatorId = it.getString("creatorId") ?: "",
                             creatorName = it.getString("creatorName") ?: "",
                             opponentId = it.getString("opponentId") ?: "",
@@ -83,6 +90,11 @@ class MultiplayerViewModel : ViewModel() {
             }
     }
 
+    override fun onCleared() {
+        gameSessionListener?.remove()
+        super.onCleared()
+    }
+
     fun createGameSession(creatorEmail: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
         fetchUserDetails(creatorEmail, { userId, username ->
             val sessionId = db.collection("GameSession").document().id
@@ -92,12 +104,14 @@ class MultiplayerViewModel : ViewModel() {
                 creatorName = username,
                 status = "waiting"
             )
-            //Update local state
-            _gameSession.update { newSession }
 
             db.collection("GameSession").document(sessionId)
                 .set(newSession)
-                .addOnSuccessListener { onSuccess(sessionId) }
+                .addOnSuccessListener {
+                    _gameSession.update { newSession }
+                    updateGameSession()  // Attach listener after creation
+                    onSuccess(sessionId)
+                }
                 .addOnFailureListener { onFailure(it) }
         }, onFailure)
     }
@@ -114,15 +128,13 @@ class MultiplayerViewModel : ViewModel() {
     }
     //Copilot Version
     fun joinGameSession(sessionId: String, opponentEmail: String) {
+        _gameSession.update { it.copy(sessionId = sessionId) }
+        val newSessionId = _gameSession.value.sessionId ?: return
         fetchUserDetails(opponentEmail, { userId, username ->
-            db.collection("GameSession").document(sessionId)
+            db.collection("GameSession").document(newSessionId)
                 .update("opponentId", userId, "opponentName", username, "status", "pending")
                 .addOnSuccessListener {
-                    _gameSession.update { it.copy(
-                        opponentId = userId,
-                        opponentName = username,
-                        status = "pending"
-                    ) }
+                    updateGameSession()
                     isOpponent = true
                 }
                 .addOnFailureListener { Log.e("Firestore", "Failed to join game session", it) }

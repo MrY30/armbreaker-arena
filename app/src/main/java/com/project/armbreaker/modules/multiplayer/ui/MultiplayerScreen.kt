@@ -54,6 +54,11 @@ fun MultiplayerScreen(
     val gameList by multiViewModel.gameList.collectAsState()
     val gameSession by multiViewModel.gameSession.collectAsState()
 
+//    LaunchedEffect(gameSession.sessionId){
+//        if(!gameSession.sessionId.isNullOrEmpty()){
+//            multiViewModel.updateGameSession()
+//        }
+//    }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier
@@ -120,20 +125,16 @@ fun MultiplayerScreen(
                 multiViewModel.clearState()
             }
         }
-        if(gameSession.status == "waiting"){
-            DialogBox(title = {CreatorBox()})
-        }
-        if(gameSession.status == "pending" && multiViewModel.isOpponent){
-            DialogBox(title = {OpponentBox()})
-        }
-        if(gameSession.status == "pending" && !multiViewModel.isOpponent){
-            DialogBox(title = { StartBox(){
-                //change status to ongoing
-                multiViewModel.ongoingGame()
-            }})
-        }
-        if(gameSession.status == "ongoing"){
-            navController.navigate("multiplayerGame")
+        gameSession.let { session ->
+            when (session.status) {
+                "ongoing" -> navController.navigate("multiplayerGame")
+                "waiting" -> DialogBox(title = { CreatorBox() })
+                "pending" -> if (multiViewModel.isOpponent) {
+                    DialogBox(title = { OpponentBox() })
+                } else {
+                    DialogBox(title = { StartBox(opponentName = gameSession.opponentName.toString()){ multiViewModel.ongoingGame() } })
+                }
+            }
         }
     }
 }
@@ -246,13 +247,13 @@ fun CreatorBox(){
 
 //If player is Creator 2
 @Composable
-fun StartBox(clickButton: () -> Unit){
+fun StartBox(opponentName: String,clickButton: () -> Unit){
     Column (
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Username",
+            text = opponentName,
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
             fontSize = 25.sp,
@@ -263,13 +264,31 @@ fun StartBox(clickButton: () -> Unit){
             text = "has joined the game!",
             fontFamily = thaleahFat,
             textAlign = TextAlign.Center,
-            fontSize = 25.sp
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
         )
         Spacer(modifier = Modifier.height(20.dp))
         ButtonLayout("START"){clickButton()}
     }
 }
 
+@Composable
+fun EnterBox(clickButton: () -> Unit){
+    Column (
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Enter the game",
+            fontFamily = thaleahFat,
+            textAlign = TextAlign.Center,
+            fontSize = 25.sp,
+            color = Color(0xFF13242F)
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+        ButtonLayout("START"){clickButton()}
+    }
+}
 
 //@Preview(showBackground = true, showSystemUi = true)
 //@Composable
