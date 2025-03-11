@@ -54,12 +54,6 @@ fun MultiplayerScreen(
     val gameList by multiViewModel.gameList.collectAsState()
     val gameSession by multiViewModel.gameSession.collectAsState()
 
-    LaunchedEffect(gameSession.sessionId) {
-        if(!gameSession.sessionId.isNullOrEmpty()){
-            multiViewModel.updateGameSession()
-        }
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier
@@ -139,7 +133,7 @@ fun MultiplayerScreen(
             }})
         }
         else if(gameSession.status == "ongoing"){
-            navController.navigate("multiGame")
+            navController.navigate("multiplayerGame")
         }
         else{/*remain blank*/}
     }
@@ -196,7 +190,6 @@ fun DialogBox(title: @Composable () -> Unit) {
         modifier = Modifier,
         onDismissRequest = { },
         confirmButton = title,
-        title = title,
     )
 }
 
