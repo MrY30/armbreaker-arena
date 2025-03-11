@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -99,35 +100,15 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Title with gradient effect
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (isLogin) "LOGIN" else "SIGN UP",
-                    fontFamily = thaleahFat,
-                    fontSize = 50.sp,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFFFFD700),
-                                Color(0xFFFFA500),
-                                Color(0xFFFFFF00),
-                                Color(0xFFDAA520)
-                            )
-                        )
-                    )
-                )
-                Text(
-                    text = if (isLogin) "LOGIN" else "SIGN UP",
-                    fontFamily = thaleahFat,
-                    fontSize = 50.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF13242F)
-                )
-            }
+            // Title with TitleLayout composable
+            TitleLayout(
+                text = if (isLogin) "LOGIN" else "SIGN UP",
+                fontFamily = thaleahFat,
+                frontColor = Color(0xFF13242F),
+                fontSize = 50,
+                modifier = Modifier.fillMaxWidth()
+            )
+
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -259,6 +240,52 @@ fun AuthTextField(
         )
     )
 }
+
+
+
+
+@Composable
+fun TitleLayout(
+    text:String,
+    fontFamily: FontFamily,
+    frontColor: Color = Color(0xFF13242F),
+    fontSize: Int = 70,
+    modifier: Modifier = Modifier
+){
+    Box(
+        modifier = modifier.fillMaxWidth(), // Allows centering
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = fontSize.sp,
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                brush = Brush.linearGradient( // Use brush instead of color
+                    colors = listOf(
+                        Color(0xFFFFD700),
+                        Color(0xFFFFA500),
+                        Color(0xFFFFFF00),
+                        Color(0xFFDAA520)
+                    ),
+                )
+            )
+        )
+        Text(
+            text = text,
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = fontSize.sp,
+            textAlign = TextAlign.Center,
+            color = frontColor,
+        )
+    }
+}
+
+
+
 
 @Preview(showBackground = true)
 @Composable
