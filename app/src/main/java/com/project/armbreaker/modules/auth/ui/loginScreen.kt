@@ -64,21 +64,81 @@ fun LoginScreen(
                     popUpTo("login") { inclusive = true }
                 }
             },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = Color.White,
             title = {
-                Text("Google Sign-In Successful", fontFamily = thaleahFat, color = Color(0xFF13242F))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Google Sign-In",
+                        fontFamily = thaleahFat,
+                        fontSize = 30.sp,
+                        style = TextStyle(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFFFFD700),
+                                    Color(0xFFFFA500),
+                                    Color(0xFFFFFF00),
+                                    Color(0xFFDAA520)
+                                )
+                            )
+                        )
+                    )
+                    Text(
+                        text = "Successful",
+                        fontFamily = thaleahFat,
+                        fontSize = 34.sp,
+                        color = Color(0xFF13242F),
+                        modifier = Modifier.offset(y = (-8).dp)
+                    )
+                }
             },
             text = {
-                Column {
-                    Text("Username: ${authState.googleUsername ?: "N/A"}", fontFamily = thaleahFat)
-                    Text("Password: Managed by Google account", fontFamily = thaleahFat)
+                Column(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Username: ${authState.googleUsername ?: "N/A"}",
+                        fontFamily = thaleahFat,
+                        fontSize = 20.sp,
+                        color = Color(0xFF13242F).copy(alpha = 0.9f),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    Text(
+                        text = "Password:",
+                        fontFamily = thaleahFat,
+                        fontSize = 20.sp,
+                        color = Color(0xFF13242F).copy(alpha = 0.9f),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    Text(
+                        text = "Managed by Google Account",
+                        fontFamily = thaleahFat,
+                        fontSize = 16.sp,
+                        color = Color(0xFF13242F).copy(alpha = 0.7f),
+                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                    )
                 }
             },
             confirmButton = {
-                HomeScreenButton("OK") {
-                    showGoogleDialog = false
-                    authViewModel.clearGoogleSignInDialog()
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    HomeScreenButton(
+                        text = "CONTINUE",
+                        modifier = Modifier
+                            .width(200.dp)
+                            .padding(vertical = 8.dp)
+                    ) {
+                        showGoogleDialog = false
+                        authViewModel.clearGoogleSignInDialog()
+                        navController.navigate("home") {
+                            popUpTo("login") { inclusive = true }
+                        }
                     }
                 }
             }
