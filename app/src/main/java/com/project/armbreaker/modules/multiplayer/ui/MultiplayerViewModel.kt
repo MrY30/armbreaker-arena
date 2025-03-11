@@ -88,9 +88,10 @@ class MultiplayerViewModel : ViewModel() {
                             winnerId = it.getString("winnerId") ?: "",
                             status = it.getString("status") ?: "",
                             ready = it.getLong("ready")?.toInt() ?: 0,
+                            score = it.getLong("score")?.toInt() ?: 0
                         )
                     }
-                    if (_gameSession.value.ready == 2) {
+                    if (_gameSession.value.ready == 2 && !gameStart) {
                         startGame()
                     }
                 }
@@ -168,7 +169,7 @@ class MultiplayerViewModel : ViewModel() {
     //text = "Tap if Ready" if tap, text = "Waiting for other player",
     // if both tap, text = "3" then text = "Tap Fast!"
 
-    var gameStarted by mutableStateOf(false)
+    var gameStart by mutableStateOf(false)
     var gameReady by mutableStateOf(false)
 
     var displayText by mutableStateOf("Tap if Ready")
@@ -185,7 +186,7 @@ class MultiplayerViewModel : ViewModel() {
             }
     }
     fun startGame() {
-        playerScore = if(isOpponent) _gameSession.value.opponentScore.toFloat() else _gameSession.value.creatorScore.toFloat()
+        playerScore = 0f // This will serve as the rotation angle of the game
         displayText = "3"
 
         viewModelScope.launch {
@@ -195,15 +196,19 @@ class MultiplayerViewModel : ViewModel() {
                 delay(1000)
             }
             displayText = "TAP FAST!"
+            gameStart = true
         }
     }
 
-//    fun tapGameBox() {
-//        if (gameStarted && countdownText == "TAP FAST!") {
-//            rotationAngle -= 1f
-//            if (rotationAngle <= -35f) {
-//                countdownText = "You Win!"
-//            }
-//        }
-//    }
+    fun changeScore(score:Long){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("score",  FieldValue.increment(score))
+            .addOnSuccessListener {}
+    }
+
+    fun tapGameBox() {
+        if(isOpponent) changeScore(-1) else changeScore(1)
+        playerScore = _gameSession.value.score.toFloat()
+    }
 }

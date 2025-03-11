@@ -1,6 +1,8 @@
 package com.project.armbreaker.modules.multiplayer.ui
 
 import android.widget.ImageView
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -66,10 +68,10 @@ fun MultiplayerGameScreen(
 
     //ROTATION BOX
     //Hide for now. Design first
-//    val animateArm by animateFloatAsState(
-//        targetValue = gameViewModel.rotationAngle,
-//        animationSpec = tween(500)
-//    )
+    val animateArm by animateFloatAsState(
+        targetValue = multiViewModel.playerScore,
+        animationSpec = tween(500)
+    )
 
     //This is the Main Game Screen
     Box (
@@ -84,6 +86,9 @@ fun MultiplayerGameScreen(
                 // if both tap, text = "3" then text = "Tap Fast!"
                 if(!multiViewModel.gameReady){
                     multiViewModel.tapToReady()
+                }
+                if(multiViewModel.displayText == "TAP FAST!"){
+                    multiViewModel.tapGameBox()
                 }
 
 //                if(!gameViewModel.gameStarted){
@@ -206,7 +211,7 @@ fun MultiplayerGameScreen(
                     .wrapContentHeight(Alignment.CenterVertically)
                     .offset(y = 60.dp)
                     .graphicsLayer(
-                        rotationZ = /*animateArm*/0f,
+                        rotationZ = animateArm,
                         transformOrigin = TransformOrigin(pivotFractionX = 0.85f, pivotFractionY = 1.0f)
                     ),
                 painter = painterResource(id = R.drawable.arm_player_v2),
