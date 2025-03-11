@@ -40,10 +40,6 @@ class MultiplayerViewModel : ViewModel() {
         updateGameSession()
     }
 
-    //updateGameSession()
-    //initialize that gamesession flow state is empty
-    //_gameSession.update {GameSession()}
-
     private fun fetchOpenGames() {
         db.collection("GameSession")
             .whereEqualTo("status", "waiting")
@@ -85,7 +81,7 @@ class MultiplayerViewModel : ViewModel() {
                             creatorName = it.getString("creatorName") ?: "",
                             opponentId = it.getString("opponentId") ?: "",
                             opponentName = it.getString("opponentName") ?: "",
-                            winnerId = it.getString("winnerId") ?: "",
+                            winnerName = it.getString("winnerId") ?: "",
                             status = it.getString("status") ?: "",
                             ready = it.getLong("ready")?.toInt() ?: 0,
                             score = it.getLong("score")?.toInt() ?: 0
@@ -93,6 +89,22 @@ class MultiplayerViewModel : ViewModel() {
                     }
                     if (_gameSession.value.ready == 2 && !gameStart) {
                         startGame()
+                    }
+                    if(gameStart){
+                        //logic tap
+                        if(isOpponent){ //If opponent taps
+                            playerScore = -1*(_gameSession.value.score.toFloat())
+                        }else{ //If creator taps
+                            playerScore = _gameSession.value.score.toFloat()
+                        }
+                        if(playerScore <= -35f){
+                            displayText = "You Win!"
+
+                        }
+                        if(playerScore >= 35f){
+                            displayText = "You Lose"
+                        }
+
                     }
                 }
             }
@@ -169,7 +181,7 @@ class MultiplayerViewModel : ViewModel() {
     //text = "Tap if Ready" if tap, text = "Waiting for other player",
     // if both tap, text = "3" then text = "Tap Fast!"
 
-    var gameStart by mutableStateOf(false)
+    private var gameStart by mutableStateOf(false)
     var gameReady by mutableStateOf(false)
 
     var displayText by mutableStateOf("Tap if Ready")
@@ -185,7 +197,7 @@ class MultiplayerViewModel : ViewModel() {
                 gameReady = true
             }
     }
-    fun startGame() {
+    private fun startGame() {
         playerScore = 0f // This will serve as the rotation angle of the game
         displayText = "3"
 
@@ -200,15 +212,56 @@ class MultiplayerViewModel : ViewModel() {
         }
     }
 
-    fun changeScore(score:Long){
+    private fun changeScore(score:Long){
         val sessionId = _gameSession.value.sessionId ?: return
         db.collection("GameSession").document(sessionId)
             .update("score",  FieldValue.increment(score))
             .addOnSuccessListener {}
     }
 
+    /*
+    from creators perspective:
+    if tap =  -1, correct implementation
+    thus, -35 is Win 35 is Lose
+    if (playScore <= -35) He should win
+
+    from opponent perspective:
+    if tap = 1, wrong implementation
+    thus, 35 is win -35 is lose
+     */
+
     fun tapGameBox() {
-        if(isOpponent) changeScore(-1) else changeScore(1)
-        playerScore = _gameSession.value.score.toFloat()
+        if(isOpponent) changeScore(1) else changeScore(-1)
+    }
+
+    fun updateWinner(winner:String){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("winnerId", winner)
+            .addOnSuccessListener {
+                _gameSession.update { it.copy(winnerName = it.creatorName) }
+            }
+    }
+
+    //DELETION FUNCTIONS
+    //After the game ends, the game session will be deleted
+    fun leaveGame() {
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .delete()
+            .addOnSuccessListener {
+                clearState()
+            }
+            .addOnFailureListener { Log.e("Firestore", "Failed to leave game", it) }
+    }
+
+    fun cancelGame(){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("opponentId", null, "opponentName", null, "status", "waiting")
+            .addOnSuccessListener {
+                clearState()
+            }
+            .addOnFailureListener { Log.e("Firestore", "Failed to leave game", it) }
     }
 }

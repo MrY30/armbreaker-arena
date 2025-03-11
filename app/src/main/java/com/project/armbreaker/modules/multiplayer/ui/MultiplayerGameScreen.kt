@@ -40,6 +40,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.bumptech.glide.Glide
 import com.project.armbreaker.R
+import com.project.armbreaker.modules.game.ui.Exit
+import com.project.armbreaker.modules.game.ui.GameButton
 import com.project.armbreaker.modules.game.ui.PixelatedCircle
 import com.project.armbreaker.modules.game.ui.ProgressBar
 import com.project.armbreaker.ui.theme.pixelGame
@@ -90,12 +92,6 @@ fun MultiplayerGameScreen(
                 if(multiViewModel.displayText == "TAP FAST!"){
                     multiViewModel.tapGameBox()
                 }
-
-//                if(!gameViewModel.gameStarted){
-//                    gameViewModel.startGame()
-//                }else{
-//                    gameViewModel.tapGameBox()
-//                }
             }
     ){
         //Adding the Background Crowd GIF
@@ -183,7 +179,7 @@ fun MultiplayerGameScreen(
             }
 
             //Progress Bar
-            ProgressBar(progress = 0.5f/*(1-((gameViewModel.rotationAngle)+35)/70)*/, modifier = Modifier
+            ProgressBar(progress = (1-((multiViewModel.playerScore)+35)/70), modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
             )
@@ -199,7 +195,7 @@ fun MultiplayerGameScreen(
                     .offset(y = 20.dp),
                 fontSize = 35.sp,
                 textAlign = TextAlign.Center,
-                color = Color(0xFF66C536)
+                color = Color(0xffcd7f32)
             )
 
             //Arm Level Image
@@ -238,6 +234,17 @@ fun MultiplayerGameScreen(
                         .weight(1f)
                         .wrapContentHeight(Alignment.Bottom)
                 )
+                Text(
+                    text = "Winner: ${gameSession.winnerName}", //Use game view model to change text status
+                    fontFamily = thaleahFat,
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .weight(1f)
+                        .wrapContentHeight(Alignment.Bottom)
+                )
                 Row(
                     modifier = Modifier
                         .weight(1f)
@@ -248,33 +255,17 @@ fun MultiplayerGameScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     //hide for now, design first
-//                if(gameViewModel.countdownText == "You Lose"){
-//                    //chooses either returning to game level screen or restart game
-//                    GameButton(
-//                        buttonImage = painterResource(R.drawable.red_button),
-//                        iconVector = Exit,
-//                        size = 60
-//                    ){
-//                        navController.popBackStack()
-//                    }
-//                    GameButton(
-//                        buttonImage = painterResource(R.drawable.yellow_button),
-//                        iconVector = Restart,
-//                        size = 60
-//                    ){
-//                        gameViewModel.restartGame()
-//                    }
-//                }
-//                if(gameViewModel.countdownText == "You Win!"){
-//                    //chooses either going back to game level screen or exit
-//                    GameButton(
-//                        buttonImage = painterResource(R.drawable.green_button),
-//                        iconPainter = painterResource(R.drawable.play_icon),
-//                        size = 60
-//                    ){
-//                        navController.popBackStack()
-//                    }
-//                }
+                    if(multiViewModel.displayText == "You Lose" || multiViewModel.displayText == "You Win!"){
+                        //chooses either returning to game level screen or restart game
+                        GameButton(
+                            buttonImage = painterResource(R.drawable.red_button),
+                            iconVector = Exit,
+                            size = 60
+                        ){
+                            multiViewModel.leaveGame()
+                            navController.popBackStack()
+                        }
+                    }
                 }
             }
         }
