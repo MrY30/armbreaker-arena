@@ -116,7 +116,7 @@ fun MultiplayerScreen(
             }
             Spacer(modifier = Modifier.height(10.dp))
             ButtonLayout(text = "Back"){
-                navController.popBackStack()
+                navController.navigate("home")
                 multiViewModel.clearState()
             }
         }

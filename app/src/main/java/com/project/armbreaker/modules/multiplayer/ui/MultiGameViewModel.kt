@@ -7,10 +7,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.project.armbreaker.modules.multiplayer.data.GameList
+import com.project.armbreaker.modules.multiplayer.data.GameSession
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 /*
@@ -22,160 +31,247 @@ if both is true, countdown start
 
 */
 
-class MultiGameViewModel: ViewModel(){
-    var gameStarted by mutableStateOf(false)
-    var gamePaused by mutableStateOf(false)
-    var allowPause by mutableStateOf(true)
-    var countdownText by mutableStateOf("Tap to Start")
-    var rotationAngle by mutableStateOf(0f)
+class SuperOldMultiplayerViewModel : ViewModel() {
+    private val db = FirebaseFirestore.getInstance()
 
-    //store current user and highest level
-    private var userEmail by mutableStateOf("")
-    private var playerLevel by mutableStateOf(0) // Store player's level to avoid redundant Firebase calls
+    private var gameSessionListener: ListenerRegistration? = null
 
-    //game states for levels
-    var gameLevel by mutableStateOf(0)
-    var gameDelay by mutableLongStateOf(0)
-    var enemyStrength by mutableStateOf(1f)
+    //This is for the list of games to display
+    private val _gameList = MutableStateFlow<List<GameList>>(emptyList())
+    val gameList: StateFlow<List<GameList>> get() = _gameList
 
-    private var gameJob: Job? = null
+    //This is for the state of the game itself
+    private val _gameSession = MutableStateFlow(GameSession())
+    val gameSession: StateFlow<GameSession> = _gameSession.asStateFlow()
 
-    fun startGame() {
-        if (!gameStarted) {
-            rotationAngle = 0f
-            allowPause = true
-            gameStarted = true
-            gamePaused = false
-            countdownText = "3"
+    //game states
+    private var gameStart by mutableStateOf(false)
+    var gameReady by mutableStateOf(false)
+    var displayText by mutableStateOf("Tap if Ready")
+    var playerScore by mutableStateOf(0f)
+    var winnerName by mutableStateOf("")
+    //Checking for necessary states
+    var isOpponent by mutableStateOf(false)
 
-            gameJob = viewModelScope.launch {
-                val countdown = listOf("3", "2", "1", "Fight!")
-                for (num in countdown) {
-                    if(gamePaused) return@launch
-                    countdownText = num
-                    delay(1000)
+    init {
+        fetchOpenGames()
+        updateGameSession()
+    }
+
+    private fun fetchOpenGames() {
+        db.collection("GameSession")
+            .whereEqualTo("status", "waiting")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("Firestore", "Error fetching open games", error)
+                    return@addSnapshotListener
                 }
-                countdownText = "TAP FAST!"
-                runGameLoop()
+                if (snapshot != null) {
+                    viewModelScope.launch {
+                        _gameList.value = snapshot.documents.mapNotNull { doc ->
+                            GameList(
+                                creatorName = doc.getString("creatorName") ?: "Unknown",
+                                sessionId = doc.id
+                            )
+                        }
+                    }
+                }
             }
+    }
+
+    private fun updateGameSession() {
+        val sessionId = _gameSession.value.sessionId ?: return // Avoid null pointer exception
+
+        gameSessionListener?.remove() // Remove existing listener before adding a new one
+
+        gameSessionListener = db.collection("GameSession")
+            .document(sessionId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.e("Firestore", "Error fetching game session", error)
+                    return@addSnapshotListener
+                }
+                snapshot?.let {
+                    _gameSession.update { currentSession ->
+                        currentSession.copy(
+                            sessionId = sessionId,
+                            creatorId = it.getString("creatorId") ?: "",
+                            creatorName = it.getString("creatorName") ?: "",
+                            opponentId = it.getString("opponentId") ?: "",
+                            opponentName = it.getString("opponentName") ?: "",
+                            winnerName = it.getString("winnerName") ?: "",
+                            status = it.getString("status") ?: "",
+                            ready = it.getLong("ready")?.toInt() ?: 0,
+                            score = it.getLong("score")?.toInt() ?: 0
+                        )
+                    }
+                    if (_gameSession.value.ready == 2 && !gameStart) {
+                        startGame()
+                    }
+                    if(gameStart){
+                        //logic tap
+                        if(isOpponent){ //If opponent taps
+                            playerScore = -1*(_gameSession.value.score.toFloat())
+                        }else{ //If creator taps
+                            playerScore = _gameSession.value.score.toFloat()
+                        }
+                        if(playerScore <= -35f){
+                            displayText = "You Win!"
+                        }else if (playerScore >= 35f){
+                            displayText = "You Lose"
+                        }
+                        if(_gameSession.value.score == 35 ){
+                            getWinner("opponentName")
+                        }else if(_gameSession.value.score == -35 ){
+                            getWinner("creatorName")
+                        }
+
+                    }
+                }
+            }
+    }
+
+    override fun onCleared() {
+        gameSessionListener?.remove()
+        super.onCleared()
+    }
+
+    fun createGameSession(creatorEmail: String, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        fetchUserDetails(creatorEmail, { userId, username ->
+            val sessionId = db.collection("GameSession").document().id
+            val newSession = GameSession(
+                sessionId = sessionId,
+                creatorId = userId,
+                creatorName = username,
+                status = "waiting"
+            )
+
+            db.collection("GameSession").document(sessionId)
+                .set(newSession)
+                .addOnSuccessListener {
+                    _gameSession.update { newSession }
+                    updateGameSession()  // Attach listener after creation
+                    onSuccess(sessionId)
+                }
+                .addOnFailureListener { onFailure(it) }
+        }, onFailure)
+    }
+
+    private fun fetchUserDetails(email: String, onSuccess: (String, String) -> Unit, onFailure: (Exception) -> Unit) {
+        db.collection("Users").whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                snapshot.documents.firstOrNull()?.let { document ->
+                    onSuccess(document.getString("userId") ?: "", document.getString("username") ?: "")
+                } ?: onFailure(Exception("User not found"))
+            }
+            .addOnFailureListener(onFailure)
+    }
+    //Copilot Version
+    fun joinGameSession(sessionId: String, opponentEmail: String) {
+        _gameSession.update { it.copy(sessionId = sessionId) }
+        val newSessionId = _gameSession.value.sessionId ?: return
+        fetchUserDetails(opponentEmail, { userId, username ->
+            db.collection("GameSession").document(newSessionId)
+                .update("opponentId", userId, "opponentName", username, "status", "pending")
+                .addOnSuccessListener {
+                    updateGameSession()
+                    isOpponent = true
+                }
+                .addOnFailureListener { Log.e("Firestore", "Failed to join game session", it) }
+        }, {Log.e("Firestore", "Failed to join game session", it)})
+    }
+
+    fun ongoingGame() {
+        val sessionId = _gameSession.value.sessionId ?: return
+
+        db.collection("GameSession").document(sessionId)
+            .update("status", "ongoing")
+            .addOnSuccessListener {
+                _gameSession.update { it.copy(status = "ongoing") }
+            }
+            .addOnFailureListener { Log.e("Firestore", "Failed to update game status", it) }
+    }
+
+
+    fun clearState(){
+        _gameSession.update { GameSession() }
+        isOpponent = false
+        gameStart = false
+        gameReady = false
+        displayText = "Tap if Ready"
+        playerScore = 0f
+        winnerName = ""
+    }
+
+    fun tapToReady(){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("ready",  FieldValue.increment(1))
+            .addOnSuccessListener {
+                displayText = "Waiting for other player"
+                gameReady = true
+            }
+    }
+    private fun startGame() {
+        playerScore = 0f // This will serve as the rotation angle of the game
+        displayText = "3"
+
+        viewModelScope.launch {
+            val countdown = listOf("3", "2", "1", "Fight!")
+            for (num in countdown) {
+                displayText = num
+                delay(1000)
+            }
+            displayText = "TAP FAST!"
+            gameStart = true
         }
     }
 
-    private suspend fun runGameLoop(){
-        while (countdownText == "TAP FAST!") {
-            if (gamePaused) return
-            delay(gameDelay) //Increasing Level, Increasing Difficulty
-            rotationAngle += enemyStrength //Increasing Level, Increasing Difficulty
-            if (rotationAngle >= 35f) {
-                countdownText = "You Lose"
-                allowPause = false
-            }
-        }
+    private fun changeScore(score:Long){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("score",  FieldValue.increment(score))
+            .addOnSuccessListener {}
     }
 
     fun tapGameBox() {
-        if (gameStarted && !gamePaused && countdownText == "TAP FAST!") {
-            rotationAngle -= 1f
-            if (rotationAngle <= -35f) {
-                countdownText = "You Win!"
-                allowPause = false
+        if(isOpponent) changeScore(1) else changeScore(-1)
+    }
 
-                // Only increase level if the player is playing at their highest level
-                if(gameLevel == playerLevel){
-                    increaseLevel(userEmail)
-                }
+    //DELETION FUNCTIONS
+    //After the game ends, the game session will be deleted
+    fun leaveGame() {
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .delete()
+            .addOnSuccessListener {
+                clearState()
             }
-        }
+            .addOnFailureListener { Log.e("Firestore", "Failed to leave game", it) }
     }
 
-    fun pauseGame(){
-        if(gameStarted && !gamePaused && allowPause){
-            gamePaused = true
-            gameJob?.cancel() //Stop the coroutine
-            countdownText = "Pause"
-        }
-    }
-
-    fun resumeGame(){
-        if(gameStarted && gamePaused){
-            gamePaused = false
-            countdownText = "TAP FAST!"
-            gameJob = viewModelScope.launch {
-                runGameLoop()
+    fun cancelGame(){
+        val sessionId = _gameSession.value.sessionId ?: return
+        db.collection("GameSession").document(sessionId)
+            .update("opponentId", null, "opponentName", null, "status", "waiting")
+            .addOnSuccessListener {
+                clearState()
             }
-        }
+            .addOnFailureListener { Log.e("Firestore", "Failed to leave game", it) }
     }
 
-    fun restartGame() {
-        gameJob?.cancel()
-        gameStarted = false
-        gamePaused = false
-        countdownText = "Tap to Start"
-        rotationAngle = 0f
-    }
-
-    //This function reloads the Game Level Screen depending on the level of the player / user
-    fun getPlayerLevel(player: String, onRead: (level: Int) -> Unit) {
-        userEmail = player
-
-        //If Level is already stored, it will not fetch again in Firebase
-        if(playerLevel != 0){
-            onRead(playerLevel)
-            return
-        }
-
-        val db = Firebase.firestore
-
-        db.collection("Users")
-            .whereEqualTo("email", player)
+    private fun getWinner(field:String){
+        val sessionId = _gameSession.value.sessionId ?: return
+        //gets the winner based on whether creator or opponent
+        db.collection("GameSession").document(sessionId)
             .get()
-            .addOnSuccessListener { snapshot ->
-                if (!snapshot.isEmpty) {
-                    val level = snapshot.documents.first().getLong("level")?.toInt() ?: 0
-                    playerLevel = level // Store the fetched level
-                    onRead(level)
-                    Log.d("FirebaseData", "Level: $level")
-                } else {
-                    Log.e("FirebaseData", "No matching user found.")
-                    onRead(1) // Default level if user not found
-                }
+            .addOnSuccessListener {winner ->
+                winnerName = winner.getString(field).toString()
             }
-            .addOnFailureListener { e ->
-                Log.e("FirebaseData", "Error fetching data", e)
-                onRead(1) // Default level in case of error
-            }
+        //updates database who wins
+        db.collection("GameSession").document(sessionId)
+            .update("winnerName", winnerName)
+            .addOnSuccessListener {}
     }
-
-    //This function levels up the player or user upon winning
-    private fun increaseLevel(player: String) {
-        val db = Firebase.firestore
-
-        val userRef = db.collection("Users")
-            .whereEqualTo("email", player)
-
-        userRef.get().addOnSuccessListener { documents ->
-            if (!documents.isEmpty) {
-                val document = documents.documents[0] // Get the first matched document
-                val currentLevel = document.getLong("level")?.toInt() ?: 0
-
-                if(currentLevel == playerLevel){
-                    val newLevel = currentLevel + 1
-                    document.reference.update("level", newLevel)
-                        .addOnSuccessListener {
-                            playerLevel = newLevel // Update stored value
-                            Log.d("FirebaseUpdate", "Level updated successfully to $newLevel")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("FirebaseUpdate", "Error updating level", e)
-                        }
-                }
-
-            } else {
-                Log.e("FirebaseUpdate", "User document not found")
-            }
-        }.addOnFailureListener { e ->
-            Log.e("FirebaseUpdate", "Error fetching user document", e)
-        }
-    }
-
 }
